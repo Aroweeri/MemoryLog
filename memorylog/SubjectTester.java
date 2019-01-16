@@ -250,6 +250,12 @@ public class SubjectTester {
 			}
 			if(questionsToAnswer) {
 				Collections.shuffle(todayQuestions);
+
+				/* protect against division by 0, least number of questions per day can only be 1. */
+				if(numberOfDays > todayQuestions.size()) {
+					numberOfDays = todayQuestions.size();
+				}
+
 				questionsPerDay = todayQuestions.size()/numberOfDays;
 				questionsPerDayRemainder = todayQuestions.size()%numberOfDays;
 				for(int i = 0,j = 0;i<todayQuestions.size();i++) {
