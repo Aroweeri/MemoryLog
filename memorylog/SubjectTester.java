@@ -266,6 +266,7 @@ public class SubjectTester {
 						if(i%(questionsPerDay+questionsPerDayRemainder) == 0 && i != 0) {
 							j++;
 						}
+						appliedRemainder = true;
 					}
 				}
 			}
