@@ -43,6 +43,10 @@ public class DateQuestion extends Question {
 	public OurDate getReviewOn() {
 		return this.reviewOn;
 	}
+	
+	public void setReviewOn(OurDate date) {
+		this.reviewOn = new OurDate(date);
+	}
 
 
 	/* adjusts an addThis value to help even out questions to complete to prevent days with lots.

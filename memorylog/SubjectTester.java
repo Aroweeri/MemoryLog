@@ -31,7 +31,7 @@ public class SubjectTester {
 			return false;
 		}
 	}
-
+	
 	public boolean save(String path) {
 		File f = new File(path);
 		PrintWriter p = null;
@@ -46,7 +46,7 @@ public class SubjectTester {
 		}
 		return false;
 	}
-
+	
 	/*
 	 * Ask the user the passed question and determine if they answered correctly.
 	 * Returns 0 on correct answer, 1 on incorrect answer, and 2 if the user desires to delete
@@ -59,14 +59,14 @@ public class SubjectTester {
 		final int SUCCESS = 1;
 		final int DELETE  = 2;
 
-		System.out.println(question.getQuestion());
+		System.out.println(question.getQuestion());	
 		System.out.print("> ");
 		String answer = input.nextLine();
 		boolean answerFound = false;
 
 		/* check if the user's answer exists in the answers. */
 		for (int i = 0;i<question.getAnswers().size();i++) {
-			if(answer.equals(question.getAnswers().get(i)))
+			if(answer.equals(question.getAnswers().get(i))) 
 				return SUCCESS;
 		}
 
@@ -95,7 +95,7 @@ public class SubjectTester {
 		/* never executes */
 		return SUCCESS;
 	}
-
+	
 	//return question that matches the parameter.
 	public DateQuestion match(DateQuestion question) {
 		for(int i = 0;i<questions.size();i++) {
@@ -105,7 +105,7 @@ public class SubjectTester {
 		}
 		return null;
 	}
-
+	
 	public void run(String path, Scanner input) {
 		LocalDate date;
 		date = LocalDate.now();
@@ -152,8 +152,8 @@ public class SubjectTester {
 							todayQuestions.remove(0);
 							break;
 						case 1:
-							if(previouslyWrong == false)
-								match(todayQuestions.get(0)).increasePeriod(new OurDate(today), questions);
+							if(previouslyWrong == false) 
+								match(todayQuestions.get(0)).increasePeriod(new OurDate(today), questions);	
 							todayQuestions.remove(0);
 							break;
 						case 2:
@@ -163,10 +163,10 @@ public class SubjectTester {
 							break;
 					}
 				}
-
+				
 				//sort real list
 				Collections.sort(questions, new DateQuestionComparator());
-
+				
 				//write to disk
 				save(path);
 			} else {
@@ -200,50 +200,131 @@ public class SubjectTester {
 						moreAnswers = false;
 					else
 						answers.add(answer);
-
-
+					
+					
 				}
 				if(!question.isEmpty() && answers.size() > 0) {
 					questions.add(new DateQuestion(new Question(answers, question)));
 				}
 			}
-
+			
 			//when finised, sort list.
 			Collections.sort(questions, new DateQuestionComparator());
-
+			
 			//write to disk
 			save(path);
 		}
 	}
 
+	public void rebalance(String path, String numberOfDaysString) {
+		LocalDate date;
+		date = LocalDate.now();
+		OurDate today = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
+		OurDate temp;
+		ArrayList<DateQuestion> todayQuestions = new ArrayList<DateQuestion>();
+		boolean questionsToAnswer = false;
+		int questionsPerDay;
+		int questionsPerDayRemainder;
+		boolean appliedRemainder = false;
+		int numberOfDays = 0;
+
+		/* Check bad user input. */
+		try {
+			numberOfDays = Integer.parseInt(numberOfDaysString);
+		} catch (java.lang.NumberFormatException e) {
+			System.out.println("Failed to parse argument.");
+			return;
+		}
+		if(numberOfDays < 2) {
+			System.out.println("Invalid value for number of days argument. Must be at least 2.");
+			return;
+		}
+
+		if(load(path)) {
+			//find questions to do today	
+			for(int i = 0;i<questions.size();i++) {
+				if(questions.get(i).getReviewOn().isLesser(today)) {
+					todayQuestions.add(new DateQuestion(questions.get(i)));
+					questionsToAnswer = true;
+				}
+			}
+			if(questionsToAnswer) {
+				Collections.shuffle(todayQuestions);
+				questionsPerDay = todayQuestions.size()/numberOfDays;
+				questionsPerDayRemainder = todayQuestions.size()%numberOfDays;
+				for(int i = 0,j = 0;i<todayQuestions.size();i++) {
+					temp = new OurDate(today);
+					for(int k = 0;k<j;k++) {
+						temp.addOne();
+					}
+					match(todayQuestions.get(i)).setReviewOn(temp);
+					if(appliedRemainder) {
+						if(i%questionsPerDay == 0) {
+							j++;
+						}
+					} else {
+						if(i%(questionsPerDay+questionsPerDayRemainder) == 0 && i != 0) {
+							j++;
+						}
+					}
+				}
+			}
+			//when finised, sort list.
+			Collections.sort(questions, new DateQuestionComparator());
+			
+			//write to disk
+			save(path);
+		}
+
+	}
+
 	public static void main(String[] args) {
 
 		Scanner input = new Scanner(System.in);
-
+		
 		String usage = "java memorylog.SubjectTester <command> <path/to/subject_file>\n\n" +
 			"Commands: \n" +
-			"run\n" +
+			"run <path/to/subject_file>\n" +
 			"\tRun the given subject file.\n" +
-			"add\n" +
-			"\tAdd questions to the given subject file.\n";
+			"add <path/to/subject_file>\n" +
+			"\tAdd questions to the given subject file.\n" +
+			"rebalance <path/to/subject_file> <number_of_days>" +
+			"\tTake all questions currently waiting to be answered and redestribute them over the next number_of_days days.";
 
-		if(args.length != 2) {
+		if(args.length < 2) {
 			System.out.println("Wrong number of arguments.");
-			System.out.println(usage);
-		} else if (!args[0].equals("add") && !args[0].equals("run")) {
-			System.out.println("Unrecognized command.");
 			System.out.println(usage);
 		} else {
 			SubjectTester subjectTester = new SubjectTester();
 			String command = args[0];
 			switch (command) {
 				case "run":
-					subjectTester.run(args[1], input);
+					if(args.length == 2) {
+						subjectTester.run(args[1], input);
+					} else {
+						System.out.println("Wrong number of arguments for run command.");
+						System.out.println(usage);
+					}
 					break;
 				case "add":
-					subjectTester.add(args[1], input);
+					if(args.length == 2) {
+						subjectTester.add(args[1], input);
+					} else {
+						System.out.println("Wrong number of arguments for add command.");
+						System.out.println(usage);
+					}
 					break;
+				case "rebalance":
+					if(args.length == 3) {
+						subjectTester.rebalance(args[1], args[2]);
+					} else {
+						System.out.println("Wrong number of arguments for rebalance command.");
+						System.out.println(usage);
+					}
+					break;
+				default:
+					System.out.println("Unrecognized command.");
 			}
-		}
+		}	
 	}
 }
