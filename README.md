@@ -33,6 +33,12 @@ Compile the source:
 	javac memorylog.TestManager.java
 	javac memorylog.SubjectTester.java
 
+# Configuration
+
+Configuration file found at memorylog/config.txt
+MEMORYLOGMAXBACKUPS: number of backups to store. Once limit is reached oldest backups will start to
+                     be deleted.
+
 # SubjectTester Setup
 
 In order to use this program, you have to pass it a quiz file to take. You can do this by using the
