@@ -1,0 +1,8 @@
+convert to a standard coding style, ex. //End function commnents
+add more comments, ex. variables in MemoryLog
+add usage for various memorylog commands
+Update example auto_memory_log.txt
+rename auto_memory_log.txt
+need to check OurDate constructor from days, years, months for values that don't make sense.
+need to fix newline issue. just add a newline in toRecord() of Item.java
+need to add test suites

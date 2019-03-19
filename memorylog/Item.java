@@ -216,4 +216,24 @@ public class Item {
 	public boolean isRecurring() {
 		return recurring;
 	}
+
+	/*
+	* takes a string in the form of "modfier1,modifier2" (with quotes) and returns an arraylist
+	* containing each field delimited by comma. 
+	*/
+	public static ArrayList<String> convertModifiersFromString(String modifiers) {
+		ArrayList<String> m = new ArrayList<String>();
+		String[] values;
+
+		if(modifiers.isEmpty()) {
+			return null;
+		}
+
+		values = modifiers.split(",");
+		for(int i = 0;i<values.length;i++) {
+			m.add(values[i]);
+		}
+
+		return m;
+	}
 }

@@ -3,11 +3,13 @@ package memorylog;
 //OurDate is a date entity.
 public class OurDate {
 	
+	private static final int MIN_YEAR = 2000;
+
 	//Data fields that hold the day, month, and year of the date.
 	private int day;
 	private int month;
 	private int year;
-	
+
 	//months serves as a reference to see how many days exist in each month.
 	private int[] months = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -17,7 +19,7 @@ public class OurDate {
 		month = 1;
 		year = 2000;
 	}
-	
+
 	public OurDate(OurDate ourDate) {
 		this(ourDate.day, ourDate.month, ourDate.year);
 	}
@@ -36,7 +38,7 @@ public class OurDate {
 		year = 2000;
 		months[1] = 28;
 	}
-	
+
 	public int getDay() {return day;}
 	public int getMonth() {return month;}
 	public int getYear() {return year;}
@@ -59,8 +61,8 @@ public class OurDate {
 
 	//receives an integer and sets it as the object's year.
 	public void setYear (int yearHolder) {
-		if (yearHolder < 2000) {
-			yearHolder = 2000;
+		if (yearHolder < MIN_YEAR) {
+			yearHolder = MIN_YEAR;
 		}
 		year = yearHolder;
 	}
@@ -133,9 +135,68 @@ public class OurDate {
 			return false;
 		}
 	}
-	
+
 	//augments the months array to leap year settings.
 	public void setLeapYear() {
 		months[1] = 29;
+	}
+
+	/*
+	 * Takes a string as parameter which represents a date in the form of "1970-01-01". The year,
+	 * month, and day are extracted and used to create a new OurDate object, which is returned.
+	 */
+	public static OurDate convertFromString(String date) {
+		OurDate returnDate = null;
+		String[] parts;
+		int day;
+		int month;
+		int year;
+
+		parts = date.split("-");
+
+		if(parts.length != 3) {
+			return null;
+		}
+
+		try {
+			year = Integer.parseInt(parts[0]);
+			month = Integer.parseInt(parts[1]);
+			day = Integer.parseInt(parts[2]);
+		} catch (java.lang.NumberFormatException e) {
+			return null;
+		}
+
+		returnDate = new OurDate(day, month, year);
+		if(returnDate.hasValidValues()) {
+			return returnDate;
+		} else return null;
+	}
+
+
+	/*
+	* Evaluates if the values for day, month, and year are valid. Ex. day is 30 if month is Feb.
+	* Returns true if so and false otherwise.
+	*/
+	public boolean hasValidValues() {
+
+		int daysInMonth = 0;
+
+		/* check year */
+		if(year < MIN_YEAR) {
+			return false;
+		}
+
+		/* check month */
+		if(month < 1 || month > 12) {
+			return false;
+		}
+
+		/* check day */
+		daysInMonth = months[month];
+		if(day < 1 || day > daysInMonth) {
+			return false;
+		}
+		
+		return true;
 	}
 } 

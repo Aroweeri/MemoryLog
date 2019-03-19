@@ -9,7 +9,6 @@ import java.time.LocalDate;
 
 class MemoryLog {
 
-	Scanner scan;
 	ArrayList<Item> entries;
 	File itemList;
 	int historySize = 10;
@@ -18,7 +17,6 @@ class MemoryLog {
 	LocalDate date;
 
 	public MemoryLog() throws java.io.FileNotFoundException {
-		scan = new Scanner(System.in);
 		entries = new ArrayList<Item>();
 		itemList = new File("memorylog/auto_memory_log.txt");
 		date = LocalDate.now();
@@ -185,53 +183,30 @@ class MemoryLog {
 	 * by loadEntries or by a user on the computer.
 	 */
 	public void saveEntries() {
-		System.out.print("Confirm save: 0-Yes/1-No: ");
-		int choice = 1;
-		boolean noExceptionThrown = true;
-		if (scan.hasNextInt()) {
-			choice = scan.nextInt();
-			scan.nextLine();
+		if (entries.size() > 0) {
+			//Arrange the entries in the proper order before saving.
+			Collections.sort(entries, new DateComparator());
+			PrintWriter p = null;
+			try {
+				p = new PrintWriter(itemList);
+			}
+			catch (java.io.FileNotFoundException e) {
+				System.out.println("There was a problem when writing to" +
+						   " the file.");
+			}
+
+			for (int i = 0;i<entries.size();i++) {
+				if (i == entries.size()-1) {
+					p.printf("%s", entries.get(i).toRecord());	
+				}
+				else {
+					p.printf("%s\n", entries.get(i).toRecord());
+				}
+			}
+			p.close();
 		}
 		else {
-			System.out.println("Invalid input, cancelling save.");
-			scan.nextLine();
-			noExceptionThrown = false;
-		}
-		
-		//Only if the user says to continue.
-		if (choice == 0 && noExceptionThrown) {
-			if (entries.size() > 0) {
-				//Arrange the entries in the proper order before saving.
-				Collections.sort(entries, new DateComparator());
-				PrintWriter p = null;
-				try {
-					p = new PrintWriter(itemList);
-				}
-				catch (java.io.FileNotFoundException e) {
-					System.out.println("There was a problem when writing to" +
-					                   " the file.");
-				}
-	
-				for (int i = 0;i<entries.size();i++) {
-					if (i == entries.size()-1) {
-						p.printf("%s", entries.get(i).toRecord());	
-					}
-					else {
-						p.printf("%s\n", entries.get(i).toRecord());
-					}
-				}
-				p.close();
-			}
-			else {
-				System.out.println("No entries to save.");
-				pressEnter();
-			}
-		}
-		else {
-			if (noExceptionThrown == true) {
-				System.out.println("Cancelling save.");
-			}
-			pressEnter();
+			System.out.println("No entries to save.");
 		}
 	}
 
@@ -321,9 +296,6 @@ class MemoryLog {
 				}
 			}
 
-			if (messages)
-				System.out.printf("%02d ", numItemsOnTestDay);
-
 			if(i == min) {
 				minItemsOnTestDay = numItemsOnTestDay;
 				updatedAddThis = i;
@@ -333,347 +305,375 @@ class MemoryLog {
 			}
 		}
 		if(messages && updatedAddThis != addThis) {
-			System.out.print("\nRefined addThis is " + updatedAddThis);
+			System.out.println("Refined addThis is " + updatedAddThis);
 		}
 
 		return updatedAddThis;
 	}
 
-	//Prints out entries based on the numbers within a passed array.
-	public void viewEntries(int[] indexes) {
-		//Prints out all of the entries that the user has.
+	/*
+	* Main part of the program, offers a menu that the user can choose options from. Allows
+	* the user to view their entries, move them, and exit.
+	* returns 1 on error, 0 otherwise.
+	*/
+	public int run(String[] args) {
 
-		if (entries.size() > 0) {
-			for (int i = 0;i<indexes.length;i++) {
-				System.out.println( String.format("%03d",i) + ": " + entries.get(indexes[i]).toString());
+		if(args.length < 1) {
+			System.out.println("Wrong number of arguments.");
+			return 1;
+		}
+
+		switch(args[0]) {
+		case "add":
+			if(add(args) != 0) {
+				return 1;
 			}
+			break;
+		case "delete":
+			if(delete(args) != 0) {
+				return 1;
+			}
+			break;
+		case "process":
+			if(process(args) != 0) {
+				return 1;
+			}
+			break;
+		case "show":
+			if(show(args) != 0) {
+				return 1;
+			}
+			break;
 		}
-		else {
-			System.out.println("No entries.");
-		}
+		return 0;
 	}
 
 	/*
-	 * Finds out what indexes of the entries ArrayList happen on the current date or previously and
-	 * then passes a normal array with those indexes to the viewEntries() method. Asks the user
-	 * whether or not they want to move an entry forward depending on a new menu choice.
-	 */
-	public void viewTodaysEntries() {
-		//Prints out the entries that are on the current day.
+	* Takes a list of argements from main(). Parses arguments for applicable arguments to the
+	* add command and adds a new entry into the entries ArrayList. Returns 1 on error,
+	* 0 otherwise.
+	*/
+	int add(String[] args) {
+		//possible command line arguments
+		String title = null;
+		OurDate reviewDate = null;
+		int addThis = 0;
+		boolean isRecurring = false;
+		String modifiersString = null;
+		ArrayList<String> modifiers = new ArrayList<String>();
+		int startModifier = 0;
+		boolean toggleable = false;
+		ArrayList<Integer> history;
 
-		boolean hasTodayEntry = false;
-		//Create ArrayList with all entries that have the date of today.
-		ArrayList<Integer> indexes = new ArrayList<Integer>();
-		OurDate today = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
-		for (int i = 0;i<entries.size();i++) {
-			if (entries.get(i).getReviewOn().calcDays() <= today.calcDays()) {
-				indexes.add(i);
-				hasTodayEntry = true;
+		Item item;
+
+		/* check required number of arguments. */
+		if(args.length < 2) {
+			System.out.println("Not enough arguments for add command.");
+			return 1;
+		}
+
+		//parse all arguments
+		for(int i = 0;i<args.length;i++) {
+			if(args[i].equals("--title")) {
+				if(args.length > i) {
+					title = args[i+1];
+				}
+			}
+			else if(args[i].equals("--review-date")){
+				if(args.length > i) {
+					reviewDate = OurDate.convertFromString(args[i+1]);
+					if(reviewDate == null) {
+						System.out.println("Invalid date supplied for --review-date.");
+						return 1;
+					}
+				} else {
+					System.out.println("No argument supplied for --review-date");
+					return 1;
+				}
+			}
+			else if(args[i].equals("--addThis")){
+				if(args.length > i) {
+					try {
+						addThis = Integer.parseInt(args[i+1]);
+					} catch (java.lang.NumberFormatException e) {
+						System.out.println("--addThis value not an integer.");
+						return 1;
+					}
+				} else {
+					System.out.println("No argument supplied for --addThis.");
+					return 1;
+				}
+			}
+			else if(args[i].equals("-r")){
+				isRecurring = true;
+			}
+			else if(args[i].equals("--modifiers")){
+				if(args.length > i) {
+					modifiers = Item.convertModifiersFromString(args[i+1]);
+					if(modifiers == null) {
+						System.out.println("Invalid format for --modifiers argument.");
+						return 1;
+					}
+					startModifier = 1;
+					toggleable = true;
+				} else {
+					System.out.println("No argument supplied for --modifiers.");
+					return 1;
+				}
+			}
+			else if(args[i].equals("--start-modifier")){
+				if(args.length > i) {
+					try {
+						startModifier = Integer.parseInt(args[i+1]);
+					} catch (java.lang.NumberFormatException e) {
+						System.out.println("--start-modifier value not an integer.");
+						return 1;
+					}
+				} else {
+					System.out.println("No argument supplied for --start-modifier.");
+					return 1;
+				}
 			}
 		}
 
-		int[] passedIndexes = new int[indexes.size()];
-		if (hasTodayEntry) {
-
-			//Convert the ArrayList to a normal array to be passed into viewEntries().
-			for (int i = 0;i<indexes.size();i++) {
-				passedIndexes[i] = indexes.get(i);
-			}
-
-			//Ask the user if they'll be moving entries around.
-			int choice = -1;
-			System.out.print("Will you be processing entries?\n0. Yes\n1. No\n");
-			try {
-				while (choice != 0 && choice != 1) {
-					System.out.print("Choice: ");
-					choice = scan.nextInt();
-					scan.nextLine();
-				}
-				System.out.println();
-				if (choice == 0) {
-					viewEntries(passedIndexes);
-					System.out.print("Index to process: ");
-					int index = scan.nextInt();
-					while(index < 0 || index > entries.size()-1) {
-						System.out.print("Invalid input, reenter: ");
-						index = scan.nextInt();
-					}
-					scan.nextLine();
-
-					//Show current record information
-					System.out.println(String.format("\nCurrent: ") + entries.get(index).toString());
-					System.out.println("History: " + entries.get(index).showHistory());
-					int addThis = entries.get(index).getAddThis();
-
-					//Only update addThis if it's a non-recurring item.
-					if(!entries.get(index).isRecurring()) {
-						System.out.print("Set new addThis: ");
-						addThis = scan.nextInt();
-						scan.nextLine();
-					}
-					
-					//Create an item to display what the entry will be changed to before it happens.
-					Item tempItem = new Item(entries.get(index));
-
-					/* pass flag to only refine addThis of entry that is not recurring. */
-					if(entries.get(index).isRecurring()) {
-						processIndex(tempItem, addThis, true, true);
-					} else {
-						processIndex(tempItem, addThis, true, false);
-					}
-
-					//Show new record information
-					System.out.println(String.format("\n%10s", "Previous: ") + entries.get(index).toString());
-					System.out.println(String.format("%10s", "New: ") + tempItem.toString());
-					System.out.print("Confirm to continue: 0-Yes/1-No: ");
-					int checker = scan.nextInt();
-					scan.nextLine();
-					System.out.println();
-					if (checker == 0) {
-
-						/* pass flag to only refine addThis of entry that is not recurring. */
-						if(entries.get(index).isRecurring()) {
-							processIndex(entries.get(index), addThis, true, true);
-						} else {
-							processIndex(entries.get(index), addThis, true, false);
-						}
-
-						entries.get(index).updateHistory(addThis,historySize);
-						Collections.sort(entries, new DateComparator());
-					}
-					else {
-						System.out.println("Cancelled.");
-						pressEnter();
-					}
-				}
-
-				//choice is 1
-				else {
-					viewEntries(passedIndexes);
-					pressEnter();
-				}
-			}
-			catch (java.util.InputMismatchException e) {
-				System.out.println("Invalid input, cancelling action.");
-				scan.nextLine();
-				pressEnter();
-			}
+		/* ensure title is set. */
+		if(title == null) {
+			System.out.println("Must include --title");
+			return 1;
 		}
 
-		//If there are no entries with the a reviewOn up until today.
-		else {
-			System.out.println("No entries today.");
-			pressEnter();
+		/* check that user supplied a valid --start-modiier value */
+		if(modifiers.size() != 0 && (startModifier < 1 || startModifier > modifiers.size())) {
+			System.out.println("--start-modifier value not valid given value for --modifiers");
+			return 1;
 		}
+
+		/* if date not supplied, use today's date. */
+		if(reviewDate == null) {
+			reviewDate = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
+		}
+
+
+		history = new ArrayList<Integer>();
+		history.add(addThis);
+
+		/* create new item and save it to disk. */
+		item = new Item(null, history, addThis, reviewDate, title, toggleable, modifiers, startModifier, isRecurring);
+		entries.add(item);
+		saveEntries();
+		return 0;
 	}
 
-	public void printMenu() {
-		System.out.print("1. View entries for today\n"
-				+ "2. View all entries\n"
-				+ "3. Add entry\n"
-				+ "4. Remove entry\n"
-				+ "5. Reload entries\n"
-				+ "6. Save entries\n"
-				+ "0. Exit\nChoice: ");
-	}
+	/*
+	* Takes a list of arguments from main(). Parses arguments for applicable arguments to the
+	* delete command and deletes the entry in entries based on the -i argument's value. Returns
+	* 1 on error, 0 otherwise.
+	*/
+	int delete(String[] args) {
+		//possible command line arguments
+		int index = -1;
 
-	//Used to add a new entry into the ArrayList.
-	public void addEntry() {
-		//Create temporary variables that the user will enter information into.
-		Quiz tempQuiz = null;
-		int tempAddThis = 0;
-		int tempYear = 0;
-		int tempMonth = 0;
-		int tempDay = 0;
-		String tempTitle = null;
-		boolean tempToggleable = false;
-		ArrayList<String> tempModifiers = new ArrayList<String>();
-		int tempModifierIdentifier = 0;
-		boolean noExceptionThrown = true;
-		boolean tempRecurring = false;
+		/* parse arguments */
+		for(int i = 1;i<args.length;i++) { //start at one to skip command argument
 
-		int holder;
-
-		//Enter values for temporary variables.
-		try {
-			System.out.print("Add this: ");
-			tempAddThis = scan.nextInt();
-			scan.nextLine();
-			System.out.print("Year: ");
-			tempYear = scan.nextInt();
-			scan.nextLine();
-			System.out.print("Month: ");
-			tempMonth = scan.nextInt();
-			scan.nextLine();
-			System.out.print("Day: ");
-			tempDay = scan.nextInt();
-			scan.nextLine();
-			System.out.print("Title: ");
-			tempTitle = scan.nextLine();
-			System.out.print("Toggleable? 0-Yes/1-No: ");
-			holder = scan.nextInt();
-			scan.nextLine();
-			if (holder == 0)
-				tempToggleable = true;
-			else tempToggleable = false;
-			System.out.print("Recurring? 0-Yes/1-No: ");
-			holder = scan.nextInt();
-			tempRecurring = holder == 0 ? true : false;
-				
-		}
-		catch (java.util.InputMismatchException e) {
-			System.out.println("Invalid input, cancelling addition.");
-			scan.nextLine();
-			pressEnter();
-			noExceptionThrown = false;
-		}
-
-		//Only if an exception wasn't thrown.
-		if (noExceptionThrown) {
-
-			//If the user has a modifiable entry
-			if (tempToggleable == true) {
-				System.out.print("Enter first toggle modifier: ");
-				tempModifiers.add(scan.nextLine());
-				System.out.print("Continue? 0-Yes/1-No: ");
+			/* -i argument. */
+			if(args[i].equals("-i") && args.length >= i+1) {
 				try {
-					int holder2 = scan.nextInt();
-					scan.nextLine();
-					while (holder2 != 1) {
-						System.out.print("Enter next toggle modifier: ");
-						tempModifiers.add(scan.nextLine());
-						System.out.print("Continue? 0-Yes/1-No: ");
-						holder2 = scan.nextInt();
-						scan.nextLine();
-					}
-					System.out.print("Enter starting toggle modifier (first is 1): ");
-					tempModifierIdentifier = scan.nextInt();
-					scan.nextLine();
+					index = Integer.parseInt(args[i+1]);
+				} catch (java.lang.NumberFormatException e) {
+					System.out.println("Error when parsing -i value.");
+					return 1;
 				}
-				catch (java.util.InputMismatchException e) {
-					System.out.println("Invalid input, cancelling addition.");
-					scan.nextLine();
-					pressEnter();
-					noExceptionThrown = false;
-				}
-			}
-
-			//Add new entry into the ArrayList based on the entered values.
-			if (noExceptionThrown) {
-				ArrayList<Integer> tempHistory = new ArrayList<Integer>();
-				tempHistory.add(tempAddThis);
-				entries.add(new Item(null, tempHistory, tempAddThis, new OurDate(tempDay, tempMonth, tempYear), tempTitle, tempToggleable, tempModifiers, tempModifierIdentifier, tempRecurring));
-				System.out.println();
+				i++;
 			}
 		}
-	}
 
-	//Used to remove an entry from the ArrayList.
-	public void removeEntry() {
-		int choice = 0;
-		if (entries.size() != 0) {
-			System.out.print("Delete this index: ");
-			try {
-				choice = scan.nextInt();
-				scan.nextLine();
-				entries.remove(choice);
-			}
-			catch (java.util.InputMismatchException e) {
-				System.out.println("Invalid input, cancelling deletion.");
-				scan.nextLine();
-				pressEnter();
-			}
+		/* ensure that index value is valid. */
+		if(index < 0 || index > entries.size()-1) {
+			System.out.println("Invalid index value.");
+			return 1;
 		}
-		else {
+
+		/* ensure there is at least one entry to delete. */
+		if(entries.size() == 0) {
 			System.out.println("No entries to delete.");
-			pressEnter();
+			return 1;
 		}
-	}
 
-	//User must press enter to continue
-	public void pressEnter() {
-		System.out.println("Press enter to continue...");
-		scan.nextLine();
+		/* delete entry and save. */
+		System.out.println(index);
+		entries.remove(index);
+		saveEntries();
+		return 0;
 	}
 
 	/*
-	 * Main part of the program, offers a menu that the user can choose options from. Allows
-	 * the user to view their entries, move them, and exit.
-	 */
-	public void runMenu() {
+	* Takes a list of arguments from main(). Parses arguments for applicable arguments to the
+	* process command and processes an entry in the entry list. Calls processIndex() to do the
+	* actual calculations.
+	* Returns 1 on error, 0 otherwise.
+	*/
+	int process(String[] args) {
+		boolean confirm = false; //by default we only show what will happen, not actually do it.
+		int id = -1;             //id of entry to process
+		int addThis = 0;         //number of days until next review/appearance in today's entries.
 
-		int choice = -1;
-
-		//While user does not say to quit the program.
-		while (choice != 0) {
-
-			/*
-			 * Gets information from the user about what they want to do.
-			 * 'choice != -2' is used with the try catch to make sure that the
-			 * menu doesn't display if they type a non-numeric value.
-			 */
-			if (choice != -2) {
-				printMenu();
+		for(int i = 1;i<args.length;i++) { //start at one to skip command argument
+			/* -c argument. */
+			if(args[i].equals("-c")) {
+				confirm = true;
 			}
-			else {
-				System.out.print("Choice: ");
-			}
-
-			try {
-				choice = scan.nextInt();
-				System.out.println();
-				scan.nextLine();
-				while (choice < 0 || choice > 6) {
-					System.out.print("Choice: ");
-					choice = scan.nextInt();
-					scan.nextLine();
+			/* -i argument. */
+			if(args[i].equals("-i") && args.length >= i+1) {
+				try {
+					id = Integer.parseInt(args[i+1]);
+					//Now that we have been given id, set addThis to the current addThis of that entry.
+					addThis = entries.get(id).getAddThis();
+				} catch (java.lang.NumberFormatException e) {
+					System.out.println("Error when parsing -i value.");
+					return 1;
 				}
+				i++;
 			}
-			catch (java.util.InputMismatchException e) {
-				choice = -2;
-				scan.nextLine();
+			/* -a argument. */
+			if(args[i].equals("-a") && args.length >= i+1) {
+				try {
+					addThis = Integer.parseInt(args[i+1]);
+				} catch (java.lang.NumberFormatException e) {
+					System.out.println("Error when parsing -a value.");
+					return 1;
+				}
+				i++;
+			}
+		}
+
+		/* validate id argument, also catch missing -i flag (default -1) */
+		if(id < 0 || id > entries.size()-1) {
+			System.out.println("Invalid value for id to process (-i)");
+			return 1;
+		}
+
+		//user specified -c option, they don't mean to test results
+		if(confirm == true) {
+			if(entries.get(id).isRecurring()) {
+				processIndex(entries.get(id), addThis, false, true);
+			} else {
+				processIndex(entries.get(id), addThis, false, false);
 			}
 
-			if (choice > 0 && choice < 7) {			
+			entries.get(id).updateHistory(addThis,historySize); //Add addThis to the history of this entry.
+			Collections.sort(entries, new DateComparator());    //sort the entries based on review date.
+			saveEntries();
+		} else {
+			//Create an item to display what the entry will be changed to before it happens.
+			Item tempItem = new Item(entries.get(id));
 
-				//User has made a choice, time to do what they said.
-				switch (choice) {
-				case 1:
-					viewTodaysEntries();
-					break;
-				case 2:
+			/* pass flag to only refine addThis of entry that is not recurring. */
+			if(entries.get(id).isRecurring()) {
+				processIndex(tempItem, addThis, true, true);
+			} else {
+				processIndex(tempItem, addThis, true, false);
+			}
 
-					//Create an array with all indexes to pass into the viewEntries method.
-					int[] allIndexes = new int[entries.size()];
-					for (int i = 0; i < entries.size(); i++) {
-						allIndexes[i] = i;
-					}
-					viewEntries(allIndexes);
-					pressEnter();
-					break;
-				case 3:
-					addEntry();
-					break;
-				case 4:
-					removeEntry();
-					System.out.println();
-					break;
-				case 5:
-					loadEntries();
-					break;
-				case 6:
-					saveEntries();
-					break;
+			//Show new record information
+			System.out.println("History: " + entries.get(id).showHistory());
+			System.out.println(String.format("\n%10s", "Previous: ") + entries.get(id).toString());
+			System.out.println(String.format("%10s", "New: ") + tempItem.toString());
+		}
+		return 0;
+	}
+
+	/*
+	* Displays a list of entries. Either all entries or only up to day based on arguments.
+	* Return 1 on error, 0 otherwise.
+	*/
+	int show(String[] args) {
+
+		//if set instructs to print all entries, not only those with dates up to today.
+		boolean allFlag = false; 
+		boolean hasTodayEntry = false;
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+
+		//while there are still arguments
+		for(int i = 1;i<args.length;i++) { //start at one to skip command argument
+
+			//--all argument
+			if(args[i].equals("--all")) {
+				allFlag = true;
+			}
+		}
+
+		if(allFlag) {
+			//User wants to show all indexs. Add them all into the indexes ArrayList.
+			for(int i = 0;i<entries.size();i++) {
+				indexes.add(i);
+			}
+		} else {
+			//fill entires with entries that have the date of today or earlier.
+			OurDate today = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
+			for(int i = 0;i<entries.size();i++) {
+				if(entries.get(i).getReviewOn().calcDays() <= today.calcDays()) {
+					indexes.add(i);
+					hasTodayEntry = true;
 				}
 			}
 		}
+
+		if(allFlag == false && hasTodayEntry == false) {
+			System.out.println("No entries today.");
+			return 0;
+		}
+		if(allFlag == true && indexes.size() == 0) {
+			System.out.println("No entries.");
+			return 0;
+		}
+
+		//actually print out the entries requested.
+		for (int i = 0;i<indexes.size();i++) {
+			System.out.println( String.format("%03d",i) + ": " + entries.get(indexes.get(i)).toString());
+		}
+		return 0;
 	}
 
-	//Main method just runs the runMenu method in MemoryLog class.
+
+	/*
+	* Prints the usage for the MemoryLog program.
+	*/
+	public static void printUsage() {
+		String usage = 
+		"java memorylog.MemoryLog <command> [args]\n" +
+		"commands:\n" +
+		"    process <-i> <index>\n" +
+		"        -c\n" +
+		"            by default process only shows what will happen. Use this option to actually do it.\n" +
+		"        -a <addThis>\n" +
+		"            set the new addThis for this entry. Default is current.\n" +
+		"    delete  <-i> <index>\n" +
+		"    add     <--title> <\"title\">\n" +
+		"        --review-date <date>\n" +
+		"            Specify the first date that this entry will appear on. Default is current day. Format is \"YYYY-MM-DD\"\n" +
+		"        --addThis <addthis>\n" +
+		"            Specify the addThis for this new entry, or the number of days between review times.\n" +
+		"        -r\n" +
+		"            Instruct command that this entry is recurring, meaning that the addThis is locked, and you don't have to specify it with the process command.\n" +
+		"        --modifiers <modifiers>\n" +
+		"            Set the entry to toggle between a list of string modifiers each process time. Argument format: \"option1,option2\"\n" +
+		"        --start-modifier <int>\n" +
+		"            set which modifier should be used first. id for first modifier is 1.\n" +
+		"    show\n" +
+		"        --all : show all entries, not just those up to today.\n";
+
+		System.out.println(usage);
+	}
+
+	//Main method just runs the run method in MemoryLog class.
 	public static void main(String[] args) {
 		try {
 			MemoryLog log = new MemoryLog();
-			log.runMenu();
+			if(log.run(args) != 0) {
+				printUsage();
+			}
 		} catch (java.io.FileNotFoundException e) {
 			System.out.println("Failed to load quizzes: could not find config file/perhaps a quiz is missing?");
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {

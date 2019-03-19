@@ -84,6 +84,7 @@ To execute MemoryLog, make sure you first have the program compiled, see the sec
 if you didn't do this.
 
 	java memorylog.MemoryLog
+		-this will display the usage for the memorylog program
 
 To run through questions in a SubjectTester file:
 
