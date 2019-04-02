@@ -1,6 +1,7 @@
 quizlet_sets_backup/
 quizzes/
 ideas.xcf
+backups/
 *.class
 *.subject
 *.bak

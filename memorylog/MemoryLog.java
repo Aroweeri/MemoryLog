@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.io.File;
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Date;
 
 class MemoryLog {
 
@@ -196,12 +197,7 @@ class MemoryLog {
 			}
 
 			for (int i = 0;i<entries.size();i++) {
-				if (i == entries.size()-1) {
-					p.printf("%s", entries.get(i).toRecord());	
-				}
-				else {
-					p.printf("%s\n", entries.get(i).toRecord());
-				}
+				p.printf("%s\n", entries.get(i).toRecord());
 			}
 			p.close();
 		}
@@ -341,6 +337,11 @@ class MemoryLog {
 			break;
 		case "show":
 			if(show(args) != 0) {
+				return 1;
+			}
+			break;
+		case "backup":
+			if(backup(args) != 0) {
 				return 1;
 			}
 			break;
@@ -645,12 +646,17 @@ class MemoryLog {
 		"java memorylog.MemoryLog <command> [args]\n" +
 		"commands:\n" +
 		"    process <-i> <index>\n" +
+		"        Take an entry at index <index> and move it forward in time." +
+		"        OPTIONS:" +
 		"        -c\n" +
 		"            by default process only shows what will happen. Use this option to actually do it.\n" +
 		"        -a <addThis>\n" +
 		"            set the new addThis for this entry. Default is current.\n" +
 		"    delete  <-i> <index>\n" +
+		"        Delete an entry found at index <index>.\n" +
 		"    add     <--title> <\"title\">\n" +
+		"        Add a new entry into the list using the options below." +
+		"        OPTIONS:" +
 		"        --review-date <date>\n" +
 		"            Specify the first date that this entry will appear on. Default is current day. Format is \"YYYY-MM-DD\"\n" +
 		"        --addThis <addthis>\n" +
@@ -661,10 +667,60 @@ class MemoryLog {
 		"            Set the entry to toggle between a list of string modifiers each process time. Argument format: \"option1,option2\"\n" +
 		"        --start-modifier <int>\n" +
 		"            set which modifier should be used first. id for first modifier is 1.\n" +
+		"    backup\n" +
+		"        Make a backup of memorylog/auto_memory_log.txt stored in backups/ folder.\n" +
 		"    show\n" +
+		"        List entries either either up to day or all entries with --all flag." +
+		"        OPTIONS:" +
 		"        --all : show all entries, not just those up to today.\n";
 
 		System.out.println(usage);
+	}
+
+
+	/*==========================================================================================
+	* Copy the current auto_memory_log.txt into the backups folder. Delete the oldest backup if
+	* there are more than MEMORYLOGMAXBACKUPS (see config.txt).
+	*
+	* Returns 1 on failure to create backup and 0 otherwise.
+	*=========================================================================================*/
+	public int backup(String[] args) {
+		File source;
+		File dest;
+		String filename = null;;
+		Scanner s = null;
+		PrintWriter p = null;
+		Date date = null;
+		File backupDir;
+
+		date = new Date();
+		filename = "backups/auto_memory_log.txt." + date.getTime();
+		source = new File("memorylog/auto_memory_log.txt");
+		dest = new File(filename);
+		backupDir = new File("backups");
+
+		/* check if backup directory exists, and if it doesn't then create it. */
+		if(!backupDir.exists() || !backupDir.isDirectory()) {
+			System.out.println("NOTE: creating backup directory at " + backupDir.getAbsolutePath());
+			if(!backupDir.mkdir()) {
+				System.out.println("Unable to create backup directory at " + backupDir.getAbsolutePath());
+				return 1;
+			}
+		}
+
+		try {
+			s = new Scanner(source);
+			p = new PrintWriter(dest);
+			while(s.hasNextLine()) {
+				p.println(s.nextLine());
+			}
+			p.close();
+			s.close();
+		} catch (java.io.FileNotFoundException e) {
+			System.out.println("Failed to open files for backup.");
+			return 1;
+		}
+		return 0;
 	}
 
 	//Main method just runs the run method in MemoryLog class.

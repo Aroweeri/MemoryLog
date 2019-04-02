@@ -1,12 +1,14 @@
+package memorylog;
+
 import java.io.File;
 import java.util.Scanner;
 
-public class Configuration {
+public class Config {
 
-	private int MEMORYLOGMAXBACKUPS = 10;
+	private int MEMORYLOGMAXBACKUPS = 10; /* currently not implemented anywhere. */
 	private boolean loadingSuccess = true;
 
-	public Configuration(String filename) {
+	public Config(String filename) {
 		loadConfiguration(filename);
 	}
 
