@@ -6,12 +6,15 @@ import java.util.Scanner;
 public class Config {
 
 	private int MEMORYLOGMAXBACKUPS = 10; /* currently not implemented anywhere. */
-	private boolean loadingSuccess = true;
+	private boolean loadingSuccess = true;/* used to indicate whether or not the loading succeeded. */
 
 	public Config(String filename) {
 		loadConfiguration(filename);
 	}
 
+	//*****************************************************************************************
+	// given a filename, load all relavent fields with the values found in the config file.
+	//*****************************************************************************************
 	public void loadConfiguration(String filename) {
 		File f = new File(filename);
 		Scanner s = null;
@@ -73,10 +76,16 @@ public class Config {
 		}
 	}
 
+	//*****************************************************************************************
+	// Getter for loadingSuccess variable.
+	//*****************************************************************************************
 	public boolean loadingSuccess() {
 		return loadingSuccess;
 	}
 
+	//*****************************************************************************************
+	// Getter for MEMORYLOGMAXBACKUPS variable.
+	//*****************************************************************************************
 	public int MEMORYLOGMAXBACKUPS() {
 		return MEMORYLOGMAXBACKUPS;
 	}

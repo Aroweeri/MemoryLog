@@ -2,27 +2,36 @@ package memorylog;
 
 import java.util.ArrayList;
 public class Question {
-	
-	//Holds a list of several possible answers to a question.
-	protected ArrayList<String> answers;
-	
-	//Holds a question.
-	protected String question;
-	
+
+	protected ArrayList<String> answers; /* Holds a list of several possible answers to a question. */
+	protected String question; /* Holds a question. */
+
+	//*****************************************************************************************
+	// default constructor
+	//*****************************************************************************************
 	public Question() {
 		this.question = null;
 		this.answers = null;
-	}//End constructor()
-	
+	}
+
+	//*****************************************************************************************
+	// initial constructor
+	//*****************************************************************************************
 	public Question(ArrayList<String> answers, String question) {
 		this.answers = answers;
 		this.question = question;
-	}//End constructor(String, String)
-	
+	}
+
+	//*****************************************************************************************
+	// copy constructor
+	//*****************************************************************************************
 	public Question(Question question) {
 		this(question.getAnswers(), question.getQuestion());
-	}//End constructor(Question)
-	
+	}
+
+	//*****************************************************************************************
+	// constructor builds object from a string with fields delimited by recordDelimiter (should be)
+	//*****************************************************************************************
 	public Question(String record, String recordDelimiter) {
 		//Read the answers from the quiz record.
 		answers = new ArrayList<String>();
@@ -49,33 +58,47 @@ public class Question {
 		}
 		question = chopOffAnswers.toString();
 	}
-	
-	//Returns a string that is written to a file to be read later.
+
+	//*****************************************************************************************
+	// Returns a string that is written to a file to be read later.
+	//*****************************************************************************************
 	public String toRecord(String recordDelimiter) {
 		StringBuilder sb = new StringBuilder();
 		//Write each answer that is in the answers ArrayList.
 		for (int i = 0;i<answers.size();i++) {
 			sb.append(answers.get(i) + recordDelimiter);
 		}
-			
+
 		//Write the question.
 		sb.append(question);
 		return sb.toString();
-	}//End toRecord()
-	
+	}
+
+	//*****************************************************************************************
+	// setter for answers
+	//*****************************************************************************************
 	public void setAnswers(ArrayList<String> answers) {
 		this.answers = answers;
-	}//End setAnswers(Arraylist<String>)
-	
+	}
+
+	//*****************************************************************************************
+	// getter for answers
+	//*****************************************************************************************
 	public ArrayList<String> getAnswers() {
 		return answers;
-	}//End getAnswers()
-	
+	}
+
+	//*****************************************************************************************
+	// setter for question
+	//*****************************************************************************************
 	public void setQuestion(String question) {
 		this.question = question;
-	}//End setQuestion(String)
-	
+	}
+
+	//*****************************************************************************************
+	// getter for question
+	//*****************************************************************************************
 	public String getQuestion() {
 		return question;
-	}//End getQuestion()
+	}
 }

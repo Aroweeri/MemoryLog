@@ -4,38 +4,26 @@ import java.util.ArrayList;
 
 public class Item {
 
-	//Quiz that is associated
-	private Quiz quiz;
+	private Quiz quiz;          /* Quiz that is associated */
+	private int addThis;        /* The number of days to add to the date. */
+	private OurDate reviewOn;   /* The date on which the item needs to be reviewed. */
+	private String title;       /* The action that the user should take to push the item further down the list. */
+	private boolean toggleable; /* If true, the item's action changes per review period (ie. review slides 1st/2nd of 1-10, 11-20). */
+	private ArrayList<String> modifiers;       /* Holds the possible split actions that change each review period. */
+	private ArrayList<Integer> addThisHistory; /* Used to keep track of history of changes to alert user of progress. */
+	private int modifierIdentifier; /* Holds the current item from modifiers that user should next perform (ie. 1st, 2nd, etc.). */
+	private boolean recurring;      /* Set if this item will never change it's addThis. */
 
-	//The number of days to add to the date.
-	private int addThis;
-
-	//The date on which the item needs to be reviewed.
-	private OurDate reviewOn;
-
-	//The action that the user should take to push the item further down the list.
-	private String title;
-
-	//If true, the item's action changes per review period (ie. review slides 1st/2nd
-	//of 1-10, 11-20).
-	private boolean toggleable;
-
-	//Holds the possible split actions that change each review period.
-	private ArrayList<String> modifiers;
-
-	//Used to keep track of history of changes to alert user of progress.
-	private ArrayList<Integer> addThisHistory;
-
-	//Holds the current item from modifiers that user should next perform (ie. 1st, 2nd, etc.).
-	private int modifierIdentifier;
-
-	//Set if this item will never change it's addThis.
-	private boolean recurring;
-
+	//*****************************************************************************************
+	// default constructor
+	//*****************************************************************************************
 	public Item() {
 		this(null, null, 0, null, null, false, null, 1, false);
 	}
 
+	//*****************************************************************************************
+	// initial constructor
+	//*****************************************************************************************
 	public Item(Quiz quiz, ArrayList<Integer> addThisHistory, int addThis, OurDate reviewOn,
 	            String title, boolean toggleable, ArrayList<String> modifiers,
 	            int modifierIdentifier, boolean recurring) {
@@ -49,7 +37,10 @@ public class Item {
 		this.modifierIdentifier = modifierIdentifier;
 		this.recurring = recurring;
 	}
-	
+
+	//*****************************************************************************************
+	// copy constructor
+	//*****************************************************************************************
 	public Item(Item item) {
 		this.quiz = item.quiz;
 		this.addThisHistory = item.addThisHistory;
@@ -68,7 +59,9 @@ public class Item {
 		this.recurring = item.recurring;
 	}
 
-	//Returns a string representation of the object to be used in viewEntries() in MemoryLog.java.
+	//*****************************************************************************************
+	// Returns a string representation of the object to be used in viewEntries() in MemoryLog.java.
+	//*****************************************************************************************
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 
@@ -94,7 +87,9 @@ public class Item {
 		return sb.toString();
 	}
 
-	//Stores the information in the object in a record that can be written and read from a file.
+	//*****************************************************************************************
+	// Stores the information in the object in a record that can be written and read from a file.
+	//*****************************************************************************************
 	public String toRecord() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(addThis + "\t");
@@ -119,7 +114,9 @@ public class Item {
 		return sb.toString();
 	}
 
-	//Show the contents of the history variable.
+	//*****************************************************************************************
+	// Show the contents of the history variable.
+	//*****************************************************************************************
 	public String showHistory() {
 		if(recurring) {
 			return "Recurring (LOCKED) item";
@@ -137,6 +134,9 @@ public class Item {
 		return sb.toString();
 	}
 
+	//*****************************************************************************************
+	// add a new integer value to the history ArrayList up to a maximum number of values.
+	//*****************************************************************************************
 	public void updateHistory(int addThis, int max) {
 		if(addThisHistory.size() >= max) {
 			addThisHistory.remove(0);	
@@ -144,83 +144,108 @@ public class Item {
 		addThisHistory.add(addThis);
 	}
 
-	public float questionsPerDay() {
-		return (float)quiz.getQuestions().size()/(float)addThis;
-	}
-	
-	//Getter for quiz.
+	//*****************************************************************************************
+	// Getter for quiz.
+	//*****************************************************************************************
 	public Quiz getQuiz() {
 		return quiz;
 	}
 
-	//Getter for addThis.
+	//*****************************************************************************************
+	// Getter for addThis.
+	//*****************************************************************************************
 	public int getAddThis() {
 		return addThis;
 	}
 
-	//Setter for addThis.
+	//*****************************************************************************************
+	// Setter for addThis.
+	//*****************************************************************************************
 	public void setAddThis(int addThis) {
 		this.addThis = addThis;
 	}
 
-	//Getter for reviewOn.
+	//*****************************************************************************************
+	// Getter for reviewOn.
+	//*****************************************************************************************
 	public OurDate getReviewOn() {
 		return reviewOn;
 	}
 
-	//Setter for reviewOn.
+	//*****************************************************************************************
+	// Setter for reviewOn.
+	//*****************************************************************************************
 	public void setReviewOn(OurDate reviewOn) {
 		this.reviewOn = reviewOn;
 	}
 
-	//Getter for title.
+	//*****************************************************************************************
+	// Getter for title.
+	//*****************************************************************************************
 	public String getTitle() {
 		return title;
 	}
 
-	//Setter for title.
+	//*****************************************************************************************
+	// Setter for title.
+	//*****************************************************************************************
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
-	//Getter for toggleable.
+	//*****************************************************************************************
+	// Getter for toggleable.
+	//*****************************************************************************************
 	public boolean getToggleable() {
 		return toggleable;
 	}
 
-	//Setter for toggleable.
+	//*****************************************************************************************
+	// Setter for toggleable.
+	//*****************************************************************************************
 	public void setToggleable(boolean toogleable) {
 		this.toggleable = toggleable;
 	}
 
-	//Getter for modifiers.
+	//*****************************************************************************************
+	// Getter for modifiers.
+	//*****************************************************************************************
 	public ArrayList<String> getModifiers() {
 		return modifiers;
 	}
 
-	//Setter for modifiers.
+	//*****************************************************************************************
+	// Setter for modifiers.
+	//*****************************************************************************************
 	public void setModifiers(ArrayList<String> modiiers) {
 		this.modifiers = modifiers;
 	}
 	
-	//Getter for modifierIdentifier
+	//*****************************************************************************************
+	// Getter for modifierIdentifier
+	//*****************************************************************************************
 	public int getModifierIdentifier() {
 		return modifierIdentifier;
 	}
 	
-	//Setter for modifierIdentifier
+	//*****************************************************************************************
+	// Setter for modifierIdentifier
+	//*****************************************************************************************
 	public void setModifierIdentifier(int a) {
 		modifierIdentifier = a;
 	}
 
+	//*****************************************************************************************
+	// Getter for recurring.
+	//*****************************************************************************************
 	public boolean isRecurring() {
 		return recurring;
 	}
 
-	/*
-	* takes a string in the form of "modfier1,modifier2" (with quotes) and returns an arraylist
-	* containing each field delimited by comma. 
-	*/
+	//*****************************************************************************************
+	// takes a string in the form of "modfier1,modifier2" (with quotes) and returns an arraylist
+	// containing each field delimited by comma. 
+	//*****************************************************************************************
 	public static ArrayList<String> convertModifiersFromString(String modifiers) {
 		ArrayList<String> m = new ArrayList<String>();
 		String[] values;

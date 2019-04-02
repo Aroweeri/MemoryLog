@@ -10,12 +10,18 @@ import java.util.Collections;
 
 public class TestManager {
 
-	ArrayList<Question> questions;
-	
+	ArrayList<Question> questions; /* the questions found in the quiz file, questions that are asked to the user. */
+
+	//*****************************************************************************************
+	// default constructor
+	//*****************************************************************************************
 	public TestManager() {
 		questions = new ArrayList<Question>();
 	}
 
+	//*****************************************************************************************
+	// handles the asking of all of the questions in the questions ArrayList
+	//*****************************************************************************************
 	public void runTest(String path) {
 		Scanner input = new Scanner(System.in);
 		if(loadQuiz(path)) {
@@ -33,6 +39,9 @@ public class TestManager {
 		}
 	}
 
+	//*****************************************************************************************
+	// Prints out the question passed and returns a value depending on whether or not the user provided the correct answer.
+	//*****************************************************************************************
 	public boolean ask(Question question, Scanner input) {
 		String userConfirm;
 
@@ -58,6 +67,9 @@ public class TestManager {
 		}
 	}
 
+	//*****************************************************************************************
+	// load the questions found in the file at path into the questions ArrayList.
+	//*****************************************************************************************
 	public boolean loadQuiz(String path) {
 		File f = new File(path);
 		Scanner s = null;
@@ -73,8 +85,11 @@ public class TestManager {
 			return false;
 		}
 	}
-	
-	
+
+
+	//*****************************************************************************************
+	// main. checks for the argument and then calls the runTest() method.
+	//*****************************************************************************************
 	public static void main(String[] args) {
 		TestManager testManager = new TestManager();
 		if(args.length != 1) {

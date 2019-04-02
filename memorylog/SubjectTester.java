@@ -9,13 +9,21 @@ import java.util.Collections;
 
 public class SubjectTester {
 
-	ArrayList<DateQuestion> questions;
+	ArrayList<DateQuestion> questions; /* questions in the subject test file. */
 	String recordDelimiter = "\t";
 
+	//******************************************************************************************
+	// default constructor
+	//******************************************************************************************
 	public SubjectTester() {
 		questions = new ArrayList<DateQuestion>();
 	}
 
+	//******************************************************************************************
+	// fill the questions ArrayList with questions found in the subject file located at path.
+	//
+	// return true on success and false on failure.
+	//******************************************************************************************
 	public boolean load(String path) {
 		File f = new File(path);
 		Scanner s = null;
@@ -31,7 +39,10 @@ public class SubjectTester {
 			return false;
 		}
 	}
-	
+
+	//******************************************************************************************
+	// save the questions in the questions ArrayList to the file located at path.
+	//******************************************************************************************
 	public boolean save(String path) {
 		File f = new File(path);
 		PrintWriter p = null;
@@ -46,12 +57,12 @@ public class SubjectTester {
 		}
 		return false;
 	}
-	
-	/*
-	 * Ask the user the passed question and determine if they answered correctly.
-	 * Returns 0 on correct answer, 1 on incorrect answer, and 2 if the user desires to delete
-	 * the question from the file.
-	 */
+
+	//******************************************************************************************
+	// Ask the user the passed question and determine if they answered correctly.
+	// Returns 0 on correct answer, 1 on incorrect answer, and 2 if the user desires to delete
+	// the question from the file.
+	//******************************************************************************************
 	public int ask(DateQuestion question, Scanner input) {
 		String userConfirm = "default";
 		final int DEFAULT =-1;
@@ -95,8 +106,10 @@ public class SubjectTester {
 		/* never executes */
 		return SUCCESS;
 	}
-	
-	//return question that matches the parameter.
+
+	//******************************************************************************************
+	// return question that matches the parameter.
+	//******************************************************************************************
 	public DateQuestion match(DateQuestion question) {
 		for(int i = 0;i<questions.size();i++) {
 			if(questions.get(i).getQuestion().equals(question.getQuestion())) {
@@ -105,7 +118,10 @@ public class SubjectTester {
 		}
 		return null;
 	}
-	
+
+	//******************************************************************************************
+	// run a given Subject file, asking all the questions and updating the values as the user answers them.
+	//******************************************************************************************
 	public void run(String path, Scanner input) {
 		LocalDate date;
 		date = LocalDate.now();
@@ -175,6 +191,9 @@ public class SubjectTester {
 		}
 	}
 
+	//******************************************************************************************
+	// add questions and answers to a Subject file. Receives data through user input.
+	//******************************************************************************************
 	public void add(String path, Scanner input) {
 		boolean moreQuestions = true;
 		boolean moreAnswers = true;
@@ -216,6 +235,11 @@ public class SubjectTester {
 		}
 	}
 
+	//******************************************************************************************
+	// Takes a subject file and rebalances the questions within it. It takes all questions that
+	// are on or before the current date and evenly spreads them out over a number of days.
+	// The specific number of days is provided by the numberOfDaysString argument. 
+	//******************************************************************************************
 	public void rebalance(String path, String numberOfDaysString) {
 		LocalDate date;
 		date = LocalDate.now();
@@ -282,9 +306,11 @@ public class SubjectTester {
 			//write to disk
 			save(path);
 		}
-
 	}
 
+	//******************************************************************************************
+	// main. processes arguments to figure out which subprogram the user wants to run.
+	//******************************************************************************************
 	public static void main(String[] args) {
 
 		Scanner input = new Scanner(System.in);
@@ -332,6 +358,6 @@ public class SubjectTester {
 				default:
 					System.out.println("Unrecognized command.");
 			}
-		}	
+		}
 	}
 }

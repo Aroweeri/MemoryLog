@@ -4,21 +4,30 @@ import java.util.ArrayList;
 import java.time.LocalDate;
 
 public class DateQuestion extends Question {
-	private int addThis;
-	private OurDate reviewOn;
+	private int addThis;      /* the number of days to add to the reviewOn date after the user has answered this question correctly. */
+	private OurDate reviewOn; /* the date that the program will present this question to the user. */
 
+	//*****************************************************************************************
+	// Default constructor
+	//*****************************************************************************************
 	public DateQuestion() {
 		super();
 		addThis=0;
 		reviewOn = null;
 	}
 
+	//*****************************************************************************************
+	// copy constructor
+	//*****************************************************************************************
 	public DateQuestion(DateQuestion dateQuestion) {
 		super(dateQuestion.answers, dateQuestion.question);
 		this.addThis = dateQuestion.addThis;
 		this.reviewOn = new OurDate(dateQuestion.reviewOn);
 	}
 
+	//*****************************************************************************************
+	// constructor takes a string that is delimited by recordDelimiter (should be)
+	//*****************************************************************************************
 	public DateQuestion(String record, String recordDelimiter) {
 		answers = new ArrayList<String>();
 		String[] fields = record.split("\t");
@@ -30,6 +39,9 @@ public class DateQuestion extends Question {
 		}
 	}
 
+	//*****************************************************************************************
+	// constructor takes a Question object and adds today's date and default addThis.
+	//*****************************************************************************************
 	public DateQuestion(Question q) {
 		LocalDate today;
 		today = LocalDate.now();
@@ -40,20 +52,27 @@ public class DateQuestion extends Question {
 		addThis = 0;
 	}
 
+	//*****************************************************************************************
+	// Getter for reviewOn
+	//*****************************************************************************************
 	public OurDate getReviewOn() {
 		return this.reviewOn;
 	}
 	
+	//*****************************************************************************************
+	// Setter for reviewOn
+	//*****************************************************************************************
 	public void setReviewOn(OurDate date) {
 		this.reviewOn = new OurDate(date);
 	}
 
-
-	/* adjusts an addThis value to help even out questions to complete to prevent days with lots.
-	 * It accomplishes this by finding a range of days that the question could be placed in based
-	 * on the passed addThis value. The algorithm is x +- (x * 0.25). So an add this of 8 could
-	 * change to anywhere between 6 and 10. It will choose the day that has the fewest
-	 * questions in that range of days surrounding the original addThis. */
+	//*****************************************************************************************
+	// adjusts an addThis value to help even out questions to complete to prevent days with lots.
+	// It accomplishes this by finding a range of days that the question could be placed in based
+	// on the passed addThis value. The algorithm is x +- (x * 0.25). So an add this of 8 could
+	// change to anywhere between 6 and 10. It will choose the day that has the fewest
+	// questions in that range of days surrounding the original addThis. */
+	//*****************************************************************************************
 	public int refineAddThis(OurDate today, ArrayList<DateQuestion> questions, int addThis, boolean messages) {
 		int min = addThis;
 		int max = addThis;
@@ -125,6 +144,10 @@ public class DateQuestion extends Question {
 		return updatedAddThis;
 	}
 
+	//*****************************************************************************************
+	// Executed when the user successfully answers a question. Increases the addThis value
+	// based on what it is currently, then runs it through the refineAddThis() method.
+	//*****************************************************************************************
 	public void increasePeriod(OurDate today, ArrayList<DateQuestion> questions) {
 		int refinedAddThis = 0;
 		if(addThis==0) {
@@ -145,13 +168,19 @@ public class DateQuestion extends Question {
 		}
 	}
 
+	//*****************************************************************************************
+	// Always sets the addThis to one. Executed when the user fails a question and has to
+	// start over their progress on it.
+	//*****************************************************************************************
 	public void decreasePeriod(OurDate today) {
 		reviewOn = new OurDate(today);
 		addThis = 1;
 		reviewOn.addOne();
 	}
 
-	//Returns a string that is written to a file to be read later.
+	//*****************************************************************************************
+	// Returns a string that is written to a file to be read later.
+	//*****************************************************************************************
 	public String toRecord(String recordDelimiter) {
 		StringBuilder sb = new StringBuilder();
 		//Write addThis

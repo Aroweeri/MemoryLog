@@ -10,12 +10,11 @@ import java.util.Date;
 
 class MemoryLog {
 
-	ArrayList<Item> entries;
-	File itemList;
-	int historySize = 10;
+	ArrayList<Item> entries; /* Is the list of entries found in auto_memory_log.txt */
+	File itemList;           /* path of auto_memory_log.txt */
+	int historySize = 10;    /* the number of addThis values that are stored within the Item's history field. */
 
-	//Used to determine what day is today. Used with viewTodaysEntries().
-	LocalDate date;
+	LocalDate date; /* Used to determine what day is today. Used with viewTodaysEntries(). */
 
 	public MemoryLog() throws java.io.FileNotFoundException {
 		entries = new ArrayList<Item>();
@@ -24,7 +23,9 @@ class MemoryLog {
 		loadEntries();
 	}
 
-	//Takes the information from a file and populates the ArrayList with Item objects from it.
+	//*****************************************************************************************
+	// Takes the information from a file and populates the ArrayList with Item objects from it.
+	//*****************************************************************************************
 	public void loadEntries() {
 		Scanner s = null;
 		boolean noExceptionThrown = true;
@@ -179,10 +180,10 @@ class MemoryLog {
 		}
 	}
 
-	/*
-	 * Takes the information stored in the entries ArrayList and writes it to a file to be read
-	 * by loadEntries or by a user on the computer.
-	 */
+	//*****************************************************************************************
+	// Takes the information stored in the entries ArrayList and writes it to a file to be read
+	// by loadEntries or by a user on the computer.
+	//*****************************************************************************************
 	public void saveEntries() {
 		if (entries.size() > 0) {
 			//Arrange the entries in the proper order before saving.
@@ -206,7 +207,9 @@ class MemoryLog {
 		}
 	}
 
-	//Changes an entry, adding days to the reviewOn and incrementing the modifier identifier.
+	//*****************************************************************************************
+	// Changes an entry, adding days to the reviewOn and incrementing the modifier identifier.
+	//*****************************************************************************************
 	public void processIndex(Item passedItem, int addThis, boolean messages, boolean isRecurring) {
 		int refinedAddThis = 0;
 
@@ -240,11 +243,15 @@ class MemoryLog {
 		
 	}
 
-	/* adjusts an addThis value to help even out items to complete to prevent days with lots.
-	 * It accomplishes this by finding a range of days that the entry could be placed in based
-	 * on the passed addThis value. The algorithm is x +- (x * 0.25). So an add this of 8 could
-	 * change to anywhere between 6 and 10. It will choose the day that has the fewest
-	 * entries in that range of days surrounding the original addThis. */
+	//*****************************************************************************************
+	// adjusts an addThis value to help even out items to complete to prevent days with lots.
+	// It accomplishes this by finding a range of days that the entry could be placed in based
+	// on the passed addThis value. The algorithm is x +- (x * 0.25). So an add this of 8 could
+	// change to anywhere between 6 and 10. It will choose the day that has the fewest
+	// entries in that range of days surrounding the original addThis. 
+	//
+	// Returns the modified addThis value.
+	//*****************************************************************************************
 	public int refineAddThis(int addThis, boolean messages) {
 		int min = addThis;
 		int max = addThis;
@@ -307,11 +314,12 @@ class MemoryLog {
 		return updatedAddThis;
 	}
 
-	/*
-	* Main part of the program, offers a menu that the user can choose options from. Allows
-	* the user to view their entries, move them, and exit.
-	* returns 1 on error, 0 otherwise.
-	*/
+	//*****************************************************************************************
+	// Main part of the program, offers a menu that the user can choose options from. Allows
+	// the user to view their entries, move them, and exit.
+	//
+	// Returns 1 on error, 0 otherwise.
+	//*****************************************************************************************
 	public int run(String[] args) {
 
 		if(args.length < 1) {
@@ -349,11 +357,12 @@ class MemoryLog {
 		return 0;
 	}
 
-	/*
-	* Takes a list of argements from main(). Parses arguments for applicable arguments to the
-	* add command and adds a new entry into the entries ArrayList. Returns 1 on error,
-	* 0 otherwise.
-	*/
+	//*****************************************************************************************
+	// Takes a list of argements from main(). Parses arguments for applicable arguments to the
+	// add command and adds a new entry into the entries ArrayList.
+	//
+	// Returns 1 on error, 0 otherwise.
+	//*****************************************************************************************
 	int add(String[] args) {
 		//possible command line arguments
 		String title = null;
@@ -466,11 +475,12 @@ class MemoryLog {
 		return 0;
 	}
 
-	/*
-	* Takes a list of arguments from main(). Parses arguments for applicable arguments to the
-	* delete command and deletes the entry in entries based on the -i argument's value. Returns
-	* 1 on error, 0 otherwise.
-	*/
+	//*****************************************************************************************
+	// Takes a list of arguments from main(). Parses arguments for applicable arguments to the
+	// delete command and deletes the entry in entries based on the -i argument's value.
+	//
+	// Returns 1 on error, 0 otherwise.
+	//*****************************************************************************************
 	int delete(String[] args) {
 		//possible command line arguments
 		int index = -1;
@@ -509,12 +519,13 @@ class MemoryLog {
 		return 0;
 	}
 
-	/*
-	* Takes a list of arguments from main(). Parses arguments for applicable arguments to the
-	* process command and processes an entry in the entry list. Calls processIndex() to do the
-	* actual calculations.
-	* Returns 1 on error, 0 otherwise.
-	*/
+	//*****************************************************************************************
+	// Takes a list of arguments from main(). Parses arguments for applicable arguments to the
+	// process command and processes an entry in the entry list. Calls processIndex() to do the
+	// actual calculations.
+	//
+	// Returns 1 on error, 0 otherwise.
+	//*****************************************************************************************
 	int process(String[] args) {
 		boolean confirm = false; //by default we only show what will happen, not actually do it.
 		int id = -1;             //id of entry to process
@@ -585,10 +596,11 @@ class MemoryLog {
 		return 0;
 	}
 
-	/*
-	* Displays a list of entries. Either all entries or only up to day based on arguments.
-	* Return 1 on error, 0 otherwise.
-	*/
+	//*****************************************************************************************
+	// Displays a list of entries. Either all entries or only up to day based on arguments.
+	//
+	// Return 1 on error, 0 otherwise.
+	//*****************************************************************************************
 	int show(String[] args) {
 
 		//if set instructs to print all entries, not only those with dates up to today.
@@ -637,10 +649,9 @@ class MemoryLog {
 		return 0;
 	}
 
-
-	/*
-	* Prints the usage for the MemoryLog program.
-	*/
+	//*****************************************************************************************
+	// Prints the usage for the MemoryLog program.
+	//*****************************************************************************************
 	public static void printUsage() {
 		String usage = 
 		"java memorylog.MemoryLog <command> [args]\n" +
@@ -678,12 +689,12 @@ class MemoryLog {
 	}
 
 
-	/*==========================================================================================
-	* Copy the current auto_memory_log.txt into the backups folder. Delete the oldest backup if
-	* there are more than MEMORYLOGMAXBACKUPS (see config.txt).
-	*
-	* Returns 1 on failure to create backup and 0 otherwise.
-	*=========================================================================================*/
+	//*****************************************************************************************
+	// Copy the current auto_memory_log.txt into the backups folder. Delete the oldest backup if
+	// there are more than MEMORYLOGMAXBACKUPS (see config.txt).
+	//
+	// Returns 1 on failure to create backup and 0 otherwise.
+	//*****************************************************************************************
 	public int backup(String[] args) {
 		File source;
 		File dest;
@@ -723,7 +734,9 @@ class MemoryLog {
 		return 0;
 	}
 
-	//Main method just runs the run method in MemoryLog class.
+	//*****************************************************************************************
+	// Main method just runs the run method in MemoryLog class.
+	//*****************************************************************************************
 	public static void main(String[] args) {
 		try {
 			MemoryLog log = new MemoryLog();
