@@ -654,36 +654,43 @@ class MemoryLog {
 	//*****************************************************************************************
 	public static void printUsage() {
 		String usage = 
-		"java memorylog.MemoryLog <command> [args]\n" +
-		"commands:\n" +
-		"    process <-i> <index>\n" +
-		"        Take an entry at index <index> and move it forward in time." +
-		"        OPTIONS:" +
-		"        -c\n" +
-		"            by default process only shows what will happen. Use this option to actually do it.\n" +
-		"        -a <addThis>\n" +
-		"            set the new addThis for this entry. Default is current.\n" +
-		"    delete  <-i> <index>\n" +
-		"        Delete an entry found at index <index>.\n" +
-		"    add     <--title> <\"title\">\n" +
-		"        Add a new entry into the list using the options below." +
-		"        OPTIONS:" +
-		"        --review-date <date>\n" +
-		"            Specify the first date that this entry will appear on. Default is current day. Format is \"YYYY-MM-DD\"\n" +
-		"        --addThis <addthis>\n" +
-		"            Specify the addThis for this new entry, or the number of days between review times.\n" +
-		"        -r\n" +
-		"            Instruct command that this entry is recurring, meaning that the addThis is locked, and you don't have to specify it with the process command.\n" +
-		"        --modifiers <modifiers>\n" +
-		"            Set the entry to toggle between a list of string modifiers each process time. Argument format: \"option1,option2\"\n" +
-		"        --start-modifier <int>\n" +
-		"            set which modifier should be used first. id for first modifier is 1.\n" +
-		"    backup\n" +
-		"        Make a backup of memorylog/auto_memory_log.txt stored in backups/ folder.\n" +
-		"    show\n" +
-		"        List entries either either up to day or all entries with --all flag." +
-		"        OPTIONS:" +
-		"        --all : show all entries, not just those up to today.\n";
+		"SYNOPSIS\n" +
+		"    java memorylog.MemoryLog <command> [args]\n" +
+		"\n" +
+		"COMMANDS\n" +
+		"\n" +
+		"process <-i> <index>\n" +
+		"    Take an entry at index <index> and move it forward in time.\n" +
+		"    OPTIONS:\n" +
+		"    -c\n" +
+		"        by default process only shows what will happen. Use this option to actually do it.\n" +
+		"    -a <addThis>\n" +
+		"        set the new addThis for this entry. Default is current.\n" +
+		"\n" +
+		"delete  <-i> <index>\n" +
+		"    Delete an entry found at index <index>.\n" +
+		"\n" +
+		"add     <--title> <\"title\">\n" +
+		"    Add a new entry into the list using the options below.\n" +
+		"    OPTIONS:\n" +
+		"    --review-date <date>\n" +
+		"        Specify the first date that this entry will appear on. Default is current day. Format is \"YYYY-MM-DD\"\n" +
+		"    --addThis <addthis>\n" +
+		"        Specify the addThis for this new entry, or the number of days between review times.\n" +
+		"    -r\n" +
+		"        Instruct command that this entry is recurring, meaning that the addThis is locked, and you don't have to specify it with the process command.\n" +
+		"    --modifiers <modifiers>\n" +
+		"        Set the entry to toggle between a list of string modifiers each process time. Argument format: \"option1,option2\"\n" +
+		"    --start-modifier <int>\n" +
+		"        set which modifier should be used first. id for first modifier is 1.\n" +
+		"\n" +
+		"backup\n" +
+		"    Make a backup of memorylog/auto_memory_log.txt stored in backups/ folder.\n" +
+		"\n" +
+		"show\n" +
+		"    List entries either either up to day or all entries with --all flag.\n" +
+		"    OPTIONS:\n" +
+		"    --all : show all entries, not just those up to today.\n";
 
 		System.out.println(usage);
 	}
