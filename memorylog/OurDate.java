@@ -189,7 +189,6 @@ public class OurDate {
 		if(parts.length != 3) {
 			return null;
 		}
-
 		try {
 			year = Integer.parseInt(parts[0]);
 			month = Integer.parseInt(parts[1]);
@@ -224,7 +223,7 @@ public class OurDate {
 		}
 
 		/* check day */
-		daysInMonth = months[month];
+		daysInMonth = months[month-1];
 		if(day < 1 || day > daysInMonth) {
 			return false;
 		}
