@@ -1,8 +1,6 @@
-Update example auto_memory_log.txt
 rename auto_memory_log.txt, add into config file
 check OurDate constructor from days, years, months for values that don't make sense.
 add test suites
-add option in process to allow for manual date setting + addThis setting
 Make MemoryLog produce error message if command (like "add", "delete") is not recognized.
 Make the optimizer start at ideal date, don't start at minimum possible date.
 Replace reading/writing with JAXB xml stuff. have option to remove a lot of code
