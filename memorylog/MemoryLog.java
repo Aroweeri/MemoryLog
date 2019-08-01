@@ -210,26 +210,33 @@ class MemoryLog {
 	//*****************************************************************************************
 	// Changes an entry, adding days to the reviewOn and incrementing the modifier identifier.
 	//*****************************************************************************************
-	public void processIndex(Item passedItem, int addThis, boolean messages, boolean isRecurring) {
+	public void processIndex(Item passedItem, int addThis, boolean messages, boolean isRecurring, OurDate manualReviewDate) {
 		int refinedAddThis = 0;
 
-		/* Only refine addThis if it is not recurring. */
-		if(!isRecurring) {
-			refinedAddThis = refineAddThis(addThis, messages);
-			passedItem.setAddThis(refinedAddThis);
-		}
-		
-		//Set date to current date, start to add days.
-		OurDate today = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
-		passedItem.setReviewOn(today);
-		for (int i = 0;i<passedItem.getAddThis();i++) {
-			passedItem.getReviewOn().addOne();
+		/* user specified a date to set the next review date to. We don't need to refine the addThis 
+		 * or set the date like normal. */
+		if(manualReviewDate == null) {
+			/* Only refine addThis if it is not recurring. */
+			if(!isRecurring) {
+				refinedAddThis = refineAddThis(addThis, messages);
+				passedItem.setAddThis(refinedAddThis);
+			}
+			
+			//Set date to current date, start to add days.
+			OurDate today = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
+			passedItem.setReviewOn(today);
+			for (int i = 0;i<passedItem.getAddThis();i++) {
+				passedItem.getReviewOn().addOne();
+			}
+
+			//reset the addThis to what it should have been originally - so that the refinement
+			//doesn't keep shrinking it each time.
+			passedItem.setAddThis(addThis);
+		} else {
+			passedItem.setAddThis(addThis);
+			passedItem.setReviewOn(manualReviewDate);
 		}
 
-		//reset the addThis to what it should have been originally - so that the refinement
-		//doesn't keep shrinking it each time.
-		passedItem.setAddThis(addThis);
-		
 		//Change modifierIdentifier if entry has modifiers.
 		if (passedItem.getToggleable()) {
 			int holder = passedItem.getModifierIdentifier();
@@ -530,6 +537,8 @@ class MemoryLog {
 		boolean confirm = false; //by default we only show what will happen, not actually do it.
 		int id = -1;             //id of entry to process
 		int addThis = 0;         //number of days until next review/appearance in today's entries.
+		OurDate manualReviewDate = null; //if assigned a date, the item will be given this value rather
+		                                 //than having it be calculated.
 
 		for(int i = 1;i<args.length;i++) { //start at one to skip command argument
 			/* -c argument. */
@@ -558,8 +567,20 @@ class MemoryLog {
 				}
 				i++;
 			}
+			/* --review-date argument */
+			if(args[i].equals("--review-date")) {
+				if(args.length > i) {
+					manualReviewDate = OurDate.convertFromString(args[i+1]);
+					if(manualReviewDate == null) {
+						System.out.println("Invalid date supplied for --review-date.");
+						return 1;
+					}
+				} else {
+					System.out.println("No argument supplied for --review-date");
+					return 1;
+				}
+			}
 		}
-
 		/* validate id argument, also catch missing -i flag (default -1) */
 		if(id < 0 || id > entries.size()-1) {
 			System.out.println("Invalid value for id to process (-i)");
@@ -569,9 +590,9 @@ class MemoryLog {
 		//user specified -c option, they don't mean to test results
 		if(confirm == true) {
 			if(entries.get(id).isRecurring()) {
-				processIndex(entries.get(id), addThis, false, true);
+				processIndex(entries.get(id), addThis, false, true, manualReviewDate);
 			} else {
-				processIndex(entries.get(id), addThis, false, false);
+				processIndex(entries.get(id), addThis, false, false, manualReviewDate);
 			}
 
 			entries.get(id).updateHistory(addThis,historySize); //Add addThis to the history of this entry.
@@ -583,9 +604,9 @@ class MemoryLog {
 
 			/* pass flag to only refine addThis of entry that is not recurring. */
 			if(entries.get(id).isRecurring()) {
-				processIndex(tempItem, addThis, true, true);
+				processIndex(tempItem, addThis, true, true, manualReviewDate);
 			} else {
-				processIndex(tempItem, addThis, true, false);
+				processIndex(tempItem, addThis, true, false, manualReviewDate);
 			}
 
 			//Show new record information
@@ -666,6 +687,8 @@ class MemoryLog {
 		"        by default process only shows what will happen. Use this option to actually do it.\n" +
 		"    -a <addThis>\n" +
 		"        set the new addThis for this entry. Default is current.\n" +
+		"    --review-date <date>\n" +
+		"        Manually specify the next date this entry will appear on. Format is \"YYYY-MM-DD\"\n" +
 		"\n" +
 		"delete  <-i> <index>\n" +
 		"    Delete an entry found at index <index>.\n" +
