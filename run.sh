@@ -12,7 +12,7 @@ cp "$quiz" "${quiz}.bak"
 java memorylog.SubjectTester run "$quiz"
 echo ""
 
-diff "$quiz" "${quiz}.bak"
+colordiff "${quiz}.bak" "$quiz"
 wc -l "$quiz"
 wc -l "${quiz}.bak"
 
