@@ -360,6 +360,9 @@ class MemoryLog {
 				return 1;
 			}
 			break;
+		default:
+			System.out.println("Unrecognized command.");
+			return 1;
 		}
 		return 0;
 	}
