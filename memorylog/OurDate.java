@@ -4,6 +4,9 @@ package memorylog;
 public class OurDate {
 	
 	private static final int MIN_YEAR = 2000;
+	private static final int DEF_YEAR = 2000;
+	private static final int DEF_MONTH= 1;
+	private static final int DEF_DAY  = 1;
 
 	//Data fields that hold the day, month, and year of the date.
 	private int day;
@@ -11,15 +14,17 @@ public class OurDate {
 	private int year;
 
 	//months serves as a reference to see how many days exist in each month.
-	private int[] months = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	private static final int[] daysPerMonthNoLeapYear  = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	private static final int[] daysPerMonthLeapYear  = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	private int[] daysPerMonth = daysPerMonthNoLeapYear;
 
 	//*****************************************************************************************
 	// default constructor
 	//*****************************************************************************************
 	public OurDate() {
-		day = 1;
-		month = 1;
-		year = 2000;
+		day = DEF_DAY;
+		month = DEF_MONTH;
+		year = DEF_YEAR;
 	}
 
 	//*****************************************************************************************
@@ -32,10 +37,17 @@ public class OurDate {
 	//*****************************************************************************************
 	// initial constructor
 	//*****************************************************************************************
-	public OurDate(int dayHolder, int monthHolder, int yearHolder) {
-		day = dayHolder;
-		month = monthHolder;
-		year = yearHolder;
+	public OurDate(int day, int month, int year) {
+		this.day = day;
+		this.month = month;
+		this.year = year;
+
+		/* set default values if the ones provided don't work. */
+		if(!validValues(year, month, day)) {
+			this.day = DEF_DAY;
+			this.month = DEF_MONTH;
+			this.year = DEF_YEAR;
+		}
 	}
 
 	//*****************************************************************************************
@@ -62,38 +74,38 @@ public class OurDate {
 	//*****************************************************************************************
 	// setter for day. checks for valid day.
 	//*****************************************************************************************
-	public void setDay(int dayHolder) {
-		if (dayHolder < 1 || dayHolder > months[month-1]) {
-			dayHolder = 1;
+	public void setDay(int day) {
+		if (day < 1 || day > daysPerMonth[month-1]) {
+			day = 1;
 		}
-		day = dayHolder;
+		this.day = day;
 	}
 
 	//*****************************************************************************************
 	// setter for month. checks for valid month
 	//*****************************************************************************************
-	public void setMonth (int monthHolder) {
-		if (monthHolder < 1 || monthHolder > 12) {
-			monthHolder = 1;
+	public void setMonth (int month) {
+		if (month < 1 || month > 12) {
+			month = 1;
 		}
-		month = monthHolder;
+		this.month = month;
 	}
 
 	//*****************************************************************************************
 	// setter for year. checks for valid year.
 	//*****************************************************************************************
-	public void setYear (int yearHolder) {
-		if (yearHolder < MIN_YEAR) {
-			yearHolder = MIN_YEAR;
+	public void setYear (int year) {
+		if (year < MIN_YEAR) {
+			year = MIN_YEAR;
 		}
-		year = yearHolder;
+		this.year = year;
 	}
 
 	//*****************************************************************************************
 	// Determines if the given OurDate object is equal to another.
 	//*****************************************************************************************
-	public boolean isEqual (OurDate dateHolder) {
-		if (dateHolder.calcDays() == this.calcDays()) 
+	public boolean isEqual (OurDate date) {
+		if (date.calcDays() == this.calcDays()) 
 			return true;
 		else
 			return false;
@@ -102,8 +114,8 @@ public class OurDate {
 	//*****************************************************************************************
 	// determines if this is lesser than the OurDate object passed as parameter.
 	//*****************************************************************************************
-	public boolean isLesser (OurDate dateHolder) {
-		if(dateHolder.calcDays() >= this.calcDays())
+	public boolean isLesser (OurDate date) {
+		if(date.calcDays() >= this.calcDays())
 			return true;
 		else return false;
 	}
@@ -112,7 +124,7 @@ public class OurDate {
 	// Adds one day to the date. Updates the month and year if the day was the end of the month or year
 	//*****************************************************************************************
 	public void addOne() {
-		if (day == months[month-1]) {
+		if (day == daysPerMonth[month-1]) {
 			if (month < 12) {
 				day = 1;
 				month++;
@@ -123,7 +135,7 @@ public class OurDate {
 				year++;
 			}
 		}
-		else if (day < months[month-1]) {
+		else if (day < daysPerMonth[month-1]) {
 			day++;
 		}
 	}
@@ -144,7 +156,7 @@ public class OurDate {
 		int numDay = 0;
 		if (month > 1) {
 			for (int i = 0;i<month-1;i++) {
-				numDay+=months[i];
+				numDay+=daysPerMonth[i];
 			}
 			numDay+= day + (year*365);
 		}
@@ -157,7 +169,7 @@ public class OurDate {
 	//*****************************************************************************************
 	// determines if the given date is a leap year.
 	//*****************************************************************************************
-	public boolean isLeapYear(int year) {
+	public static boolean isLeapYear(int year) {
 		if((year % 400 == 0) || ((year % 4 == 0) && (year % 100 != 0))) {
 			return true;
 		}
@@ -170,7 +182,7 @@ public class OurDate {
 	// augments the months array to leap year settings.
 	//*****************************************************************************************
 	public void setLeapYear() {
-		months[1] = 29;
+		daysPerMonth = daysPerMonthLeapYear;
 	}
 
 	//*****************************************************************************************
@@ -198,19 +210,17 @@ public class OurDate {
 		}
 
 		returnDate = new OurDate(day, month, year);
-		if(returnDate.hasValidValues()) {
+		if(validValues(year, month, day)) {
 			return returnDate;
 		} else return null;
 	}
-
 
 	//*****************************************************************************************
 	// Evaluates if the values for day, month, and year are valid. Ex. day is 30 if month is Feb.
 	// Returns true if so and false otherwise.
 	//*****************************************************************************************
-	public boolean hasValidValues() {
+	private static boolean validValues(int year, int month, int day) {
 
-		int daysInMonth = 0;
 
 		/* check year */
 		if(year < MIN_YEAR) {
@@ -223,11 +233,15 @@ public class OurDate {
 		}
 
 		/* check day */
-		daysInMonth = months[month-1];
-		if(day < 1 || day > daysInMonth) {
-			return false;
+		if(isLeapYear(year)) {
+			if(day < 1 || day > daysPerMonthLeapYear[month-1])
+				return false;
+		} else {
+			if(day < 1 || day > daysPerMonthNoLeapYear[month-1])
+				return false;
 		}
-		
+
 		return true;
 	}
+
 } 
