@@ -557,6 +557,9 @@ class MemoryLog {
 				} catch (java.lang.NumberFormatException e) {
 					System.out.println("Error when parsing -i value.");
 					return 1;
+				} catch (java.lang.IndexOutOfBoundsException e) {
+					System.out.println("Value for -i invalid.");
+					return 1;
 				}
 				i++;
 			}
