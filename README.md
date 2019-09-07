@@ -26,12 +26,9 @@ information, and keep track of recurring events.
 # Compilation
 
 Install the Java JDK so that you can compile the source.
+Install ant
 cd to the MemoryLog directory.
-Compile the source:
-
-	javac memorylog.MemoryLog.java
-	javac memorylog.TestManager.java
-	javac memorylog.SubjectTester.java
+ant jar
 
 # Configuration
 
@@ -83,20 +80,20 @@ appear there as long as it's review date is either today or in the past.
 To execute MemoryLog, make sure you first have the program compiled, see the section on compilation
 if you didn't do this.
 
-	java memorylog.MemoryLog
+	java -jar build/jar/MemoryLog.jar
 		-this will display the usage for the memorylog program
 
 To run through questions in a SubjectTester file:
 
-	java memorylog.SubjectTester run <path/to/subject_file>
+	java -jar build/jar/SubjectTester.jar run <path/to/subject_file>
 
 To add questions to a subject file (This can be done manually but it's a bit faster this way.)
 This will start an interactive prompt that will ask you for questions and answers:
 
-	java memorylog.SubjectTester add <path/to/subject_file>
+	java -jar build/jar/SubjectTester.jar add <path/to/subject_file>
 
 Note that the empty subject file must exist before running this command.
 
 To take a quiz that you've made:
 
-	java memorylog.TestManager <path/to/quiz>
+	java -jar build/jar/TestManager.jar <path/to/quiz>

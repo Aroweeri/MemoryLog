@@ -1,0 +1,40 @@
+<project>
+
+	<target name="clean">
+		<delete dir="build"/>
+	</target>
+
+	<target name="compile" depends="clean">
+		<mkdir dir="build/classes"/>
+		<javac sourcepath="src" srcdir="src/memorylog" destdir="build/classes">
+			<classpath path="src"/>
+		</javac>
+		<javac sourcepath="src" srcdir="src/testmanager" destdir="build/classes">
+			<classpath path="src"/>
+		</javac>
+		<javac sourcepath="src" srcdir="src/subjecttester" destdir="build/classes">
+			<classpath path="src"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="clean,compile">
+		<mkdir dir="build/jar"/>
+		<jar destfile="build/jar/MemoryLog.jar" basedir="build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="memorylog.MemoryLog"/>
+			</manifest>
+		</jar>
+		<jar destfile="build/jar/SubjectTester.jar" basedir="build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="subjecttester.SubjectTester"/>
+			</manifest>
+		</jar>
+		<jar destfile="build/jar/TestManager.jar" basedir="build/classes">
+			<manifest>
+				<attribute name="Main-Class" value="testmanager.TestManager"/>
+			</manifest>
+		</jar>
+
+	</target>
+
+</project>
