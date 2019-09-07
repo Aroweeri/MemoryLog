@@ -1,4 +1,4 @@
-package memorylog;
+package testmanager;
 
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.lang.StringBuilder;
 import java.util.Random;
 import java.io.PrintWriter;
 import java.util.Collections;
+import common.Question;
 
 public class TestManager {
 

@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Date;
+import common.*;
 
 class MemoryLog {
 
@@ -18,7 +19,7 @@ class MemoryLog {
 
 	public MemoryLog() throws java.io.FileNotFoundException {
 		entries = new ArrayList<Item>();
-		itemList = new File("memorylog/auto_memory_log.txt");
+		itemList = new File("src/memorylog/auto_memory_log.txt");
 		date = LocalDate.now();
 		loadEntries();
 	}

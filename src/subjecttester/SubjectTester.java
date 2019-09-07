@@ -1,4 +1,4 @@
-package memorylog;
+package subjecttester;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.util.Collections;
+import common.*;
 
 public class SubjectTester {
 

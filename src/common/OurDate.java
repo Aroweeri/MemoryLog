@@ -1,4 +1,4 @@
-package memorylog;
+package common;
 
 //OurDate is a date entity.
 public class OurDate {

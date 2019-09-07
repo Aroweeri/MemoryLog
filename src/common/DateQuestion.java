@@ -1,4 +1,4 @@
-package memorylog;
+package common;
 
 import java.util.ArrayList;
 import java.time.LocalDate;
