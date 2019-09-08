@@ -743,7 +743,7 @@ class MemoryLog {
 
 		date = new Date();
 		filename = "backups/auto_memory_log.txt." + date.getTime();
-		source = new File("memorylog/auto_memory_log.txt");
+		source = new File("src/memorylog/auto_memory_log.txt");
 		dest = new File(filename);
 		backupDir = new File("backups");
 
