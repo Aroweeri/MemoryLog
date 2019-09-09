@@ -9,7 +9,7 @@ if ! [ -e "$quiz" ] ; then
 fi
 
 cp "$quiz" "${quiz}.bak"
-java memorylog.SubjectTester run "$quiz"
+java -jar build/jar/SubjectTester.jar run "$quiz"
 echo ""
 
 colordiff "${quiz}.bak" "$quiz"
