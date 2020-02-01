@@ -25,21 +25,21 @@ information, and keep track of recurring events.
   
 # Compilation
 
-Install the Java JDK so that you can compile the source.
-Install ant
-cd to the MemoryLog directory.
-ant jar
+Install the Java JDK so that you can compile the source.  
+Install ant  
+cd to the MemoryLog directory.  
+`ant jar`
 
 # Configuration
 
-Configuration file found at memorylog/config.txt
+Configuration file found at memorylog/config.txt  
 MEMORYLOGMAXBACKUPS: number of backups to store. Once limit is reached oldest backups will start to
                      be deleted.
 
 # SubjectTester Setup
 
 In order to use this program, you have to pass it a quiz file to take. You can do this by using the
-subprogram "add" as described in the "Running" section.
+subprogram "add" as described in the "Running" section.  
 It is used to create questions and sets the proper date and initial review time for the question.
 
 # TestManager Setup
@@ -58,7 +58,7 @@ With your quiz completed, you can now execute the quiz using the TestManager pro
 Running section.
 
 Now we will make an entry for this quiz in MemoryLog so that you can use it as a spaced repitition
-helper.
+helper.  
 NOTE: If you make a mistake, just complete the prompts and then delete the entry afterwards. 
 
 1. In the program menu (run the program), select the option to add an entry.
@@ -80,20 +80,17 @@ appear there as long as it's review date is either today or in the past.
 To execute MemoryLog, make sure you first have the program compiled, see the section on compilation
 if you didn't do this.
 
-	java -jar build/jar/MemoryLog.jar
-		-this will display the usage for the memorylog program
+`java -jar build/jar/MemoryLog.jar`  
+This will display the usage for the memorylog program
 
-To run through questions in a SubjectTester file:
+To run through questions in a SubjectTester file:  
+`java -jar build/jar/SubjectTester.jar run <path/to/subject_file>`
 
-	java -jar build/jar/SubjectTester.jar run <path/to/subject_file>
-
-To add questions to a subject file (This can be done manually but it's a bit faster this way.)
-This will start an interactive prompt that will ask you for questions and answers:
-
-	java -jar build/jar/SubjectTester.jar add <path/to/subject_file>
+To add questions to a subject file (This can be done manually but it's a bit faster this way.)  
+This will start an interactive prompt that will ask you for questions and answers:  
+`java -jar build/jar/SubjectTester.jar add <path/to/subject_file>`
 
 Note that the empty subject file must exist before running this command.
 
-To take a quiz that you've made:
-
-	java -jar build/jar/TestManager.jar <path/to/quiz>
+To take a quiz that you've made:  
+`java -jar build/jar/TestManager.jar <path/to/quiz>`
