@@ -17,6 +17,18 @@
 		</javac>
 	</target>
 
+	<target name="compile-tests" depends="compile">
+		<mkdir dir="build/classes"/>
+		<javac sourcepath="src" srcdir="src/tests" destdir="build/classes">
+			<classpath>
+				<pathelement location="src"/>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
 	<target name="jar" depends="clean,compile">
 		<mkdir dir="build/jar"/>
 		<jar destfile="build/jar/MemoryLog.jar" basedir="build/classes">
@@ -35,6 +47,18 @@
 			</manifest>
 		</jar>
 
+	</target>
+
+	<target name="test" depends="compile-tests">
+		<java classname="org.junit.runner.JUnitCore" args="tests.OurDateTest">
+			<classpath>
+				<pathelement location="src"/>
+				<pathelement path="build/classes"/>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</java>
 	</target>
 
 </project>
