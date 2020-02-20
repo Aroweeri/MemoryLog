@@ -94,3 +94,8 @@ Note that the empty subject file must exist before running this command.
 
 To take a quiz that you've made:  
 `java -jar build/jar/TestManager.jar <path/to/quiz>`
+
+# Running Tests
+
+To run the JUnit tests, go to the root of the repo and run `ant test`  
+The tests are found under `src/tests`
