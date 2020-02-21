@@ -32,9 +32,12 @@ cd to the MemoryLog directory.
 
 # Configuration
 
-Configuration file found at memorylog/config.txt  
-MEMORYLOGMAXBACKUPS: number of backups to store. Once limit is reached oldest backups will start to
-                     be deleted.
+Configuration file is config.txt at root of project.   
+* MEMORYLOGMAXBACKUPS  
+   number of backups to store. Once limit is reached oldest backups will start to be deleted.
+
+* MEMLOGPATH  
+   the file that MemoryLog.java will read from (the main file)
 
 # SubjectTester Setup
 
