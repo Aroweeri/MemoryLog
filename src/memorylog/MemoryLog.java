@@ -11,8 +11,8 @@ import common.*;
 
 class MemoryLog {
 
-	ArrayList<Item> entries; /* Is the list of entries found in auto_memory_log.txt */
-	File itemList;           /* path of auto_memory_log.txt */
+	ArrayList<Item> entries; /* Is the list of entries found in the memlog file */
+	File itemList;           /* path of the memlog file */
 	int historySize = 10;    /* the number of addThis values that are stored within the Item's history field. */
 	Config config;
 
@@ -43,8 +43,9 @@ class MemoryLog {
 		//Open the input stream.
 		try {
 			s = new Scanner(itemList);
-		} finally {
+		} catch (java.io.FileNotFoundException e) {
 			System.out.println("Could not load " + itemList.getAbsolutePath());
+			throw new java.io.FileNotFoundException();
 		}
 
 		//Create temporary holders for all of the values in each line of the file.
@@ -714,7 +715,7 @@ class MemoryLog {
 		"        set which modifier should be used first. id for first modifier is 1.\n" +
 		"\n" +
 		"backup\n" +
-		"    Make a backup of memorylog/auto_memory_log.txt stored in backups/ folder.\n" +
+		"    Make a backup of your memlog file, store in backups/ folder.\n" +
 		"\n" +
 		"show\n" +
 		"    List entries either either up to day or all entries with --all flag.\n" +
@@ -726,7 +727,7 @@ class MemoryLog {
 
 
 	//*****************************************************************************************
-	// Copy the current auto_memory_log.txt into the backups folder. Delete the oldest backup if
+	// Copy the current memlog file into the backups folder. Delete the oldest backup if
 	// there are more than MEMORYLOGMAXBACKUPS (see config.txt).
 	//
 	// Returns 1 on failure to create backup and 0 otherwise.
@@ -739,10 +740,16 @@ class MemoryLog {
 		PrintWriter p = null;
 		Date date = null;
 		File backupDir;
+		String[] memlogFilenameParts;
+		String memlogFilename;
+
+		/* get only the filename of whatever the path was to the memlog file. */
+		memlogFilenameParts = config.MEMLOGPATH().split("/");
+		memlogFilename = memlogFilenameParts[memlogFilenameParts.length-1];
 
 		date = new Date();
-		filename = "backups/auto_memory_log.txt." + date.getTime();
-		source = new File("src/memorylog/auto_memory_log.txt");
+		filename = "backups/" + memlogFilename + "." + date.getTime();
+		source = new File(config.MEMLOGPATH());
 		dest = new File(filename);
 		backupDir = new File("backups");
 
@@ -782,9 +789,9 @@ class MemoryLog {
 		} catch (java.io.FileNotFoundException e) {
 			System.out.println("FileNotFoundException caught. Are you missing memlog file, config file?");
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
-			System.out.println("ArrayIndexOutOfBoundsException: Unable to read auto_memory_log.txt.");
+			System.out.println("ArrayIndexOutOfBoundsException: Unable to read memlog file.");
 		} catch (java.lang.NumberFormatException e) {
-			System.out.println("NumberFormatException: Unable to read auto_memory_log.txt.");
+			System.out.println("NumberFormatException: Unable to read memlog file.");
 		} catch (ConfigLoadException e) {
 			System.out.println("Config file failed to load, check for errors in the file.");
 		}

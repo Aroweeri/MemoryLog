@@ -1,2 +1,2 @@
 MEMORYLOGMAXBACKUPS=10
-MEMLOGPATH=derp.memlog
+MEMLOGPATH=default.memlog
