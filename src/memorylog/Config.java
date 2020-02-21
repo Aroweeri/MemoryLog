@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Config {
 
 	private int MEMORYLOGMAXBACKUPS = 10; /* currently not implemented anywhere. */
+	private String MEMLOGPATH =       "default.memlog";
 	private boolean loadingSuccess = true;/* used to indicate whether or not the loading succeeded. */
 
 	public Config(String filename) {
@@ -60,8 +61,9 @@ public class Config {
 			currentLine++;
 
 			//determine option and set value
-			option = line.subSequence(0, indexOfEqualsSign-1).toString();
-			value = line.subSequence(indexOfEqualsSign+1, line.length()-1).toString();
+			option = line.subSequence(0, indexOfEqualsSign).toString();
+			value = line.subSequence(indexOfEqualsSign+1, line.length()).toString();
+
 
 			if(option.equals("MEMORYLOGMAXBACKUPS")) {
 				try {
@@ -71,6 +73,8 @@ public class Config {
 					loadingSuccess = false;
 					return;
 				}
+			} else if (option.equals("MEMLOGPATH")) {
+				MEMLOGPATH = value;
 			}
 
 		}
@@ -88,5 +92,12 @@ public class Config {
 	//*****************************************************************************************
 	public int MEMORYLOGMAXBACKUPS() {
 		return MEMORYLOGMAXBACKUPS;
+	}
+
+	//*****************************************************************************************
+	// Getter for MEMLOGPATH variable.
+	//*****************************************************************************************
+	public String MEMLOGPATH() {
+		return MEMLOGPATH;
 	}
 }

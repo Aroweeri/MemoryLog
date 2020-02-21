@@ -14,12 +14,17 @@ class MemoryLog {
 	ArrayList<Item> entries; /* Is the list of entries found in auto_memory_log.txt */
 	File itemList;           /* path of auto_memory_log.txt */
 	int historySize = 10;    /* the number of addThis values that are stored within the Item's history field. */
+	Config config;
 
 	LocalDate date; /* Used to determine what day is today. Used with viewTodaysEntries(). */
 
-	public MemoryLog() throws java.io.FileNotFoundException {
+	public MemoryLog() throws java.io.FileNotFoundException, ConfigLoadException {
+		config = new Config("config.txt");
+		if(!config.loadingSuccess()) {
+			throw new ConfigLoadException();
+		}
 		entries = new ArrayList<Item>();
-		itemList = new File("src/memorylog/auto_memory_log.txt");
+		itemList = new File(config.MEMLOGPATH());
 		date = LocalDate.now();
 		loadEntries();
 	}
@@ -27,9 +32,8 @@ class MemoryLog {
 	//*****************************************************************************************
 	// Takes the information from a file and populates the ArrayList with Item objects from it.
 	//*****************************************************************************************
-	public void loadEntries() {
+	public void loadEntries() throws java.io.FileNotFoundException {
 		Scanner s = null;
-		boolean noExceptionThrown = true;
 
 		//Remove all current entries.
 		while (entries.size() != 0) {
@@ -39,145 +43,140 @@ class MemoryLog {
 		//Open the input stream.
 		try {
 			s = new Scanner(itemList);
-		}
-		catch (java.io.FileNotFoundException e) {
+		} finally {
 			System.out.println("Could not load " + itemList.getAbsolutePath());
-			noExceptionThrown = false;
 		}
 
-		if (noExceptionThrown) {
+		//Create temporary holders for all of the values in each line of the file.
+		Quiz tempQuiz = null;
+		int tempAddThis = 0;
+		int tempYear = 0;
+		int tempMonth = 0;
+		int tempDay = 0;
+		String tempTitle = null;
+		ArrayList<Integer> tempHistory = new ArrayList<Integer>();
+		boolean tempToggleable = false;
+		ArrayList<String> tempModifiers = new ArrayList<String>();
+		int tempModifierIdentifier = 0;
+		boolean tempRecurring = false;
+		int tempRecurringInt = 0;
+		String record = null;
 
-			//Create temporary holders for all of the values in each line of the file.
-			Quiz tempQuiz = null;
-			int tempAddThis = 0;
-			int tempYear = 0;
-			int tempMonth = 0;
-			int tempDay = 0;
-			String tempTitle = null;
-			ArrayList<Integer> tempHistory = new ArrayList<Integer>();
-			boolean tempToggleable = false;
-			ArrayList<String> tempModifiers = new ArrayList<String>();
-			int tempModifierIdentifier = 0;
-			boolean tempRecurring = false;
-			int tempRecurringInt = 0;
-			String record = null;
-
-			//While there is still information in the file.
-			while (s.hasNextLine()) {
+		//While there is still information in the file.
+		while (s.hasNextLine()) {
+			record = s.nextLine();
+			
+			//Allow full-line comments
+			while (record.charAt(0) == '#') {
 				record = s.nextLine();
-				
-				//Allow full-line comments
-				while (record.charAt(0) == '#') {
-					record = s.nextLine();
-				}
-				
-				StringBuilder sb = new StringBuilder();
-				int offset = 0;
-
-				//Get the addThis value.
-				for(;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				tempAddThis = Integer.parseInt(sb.toString());
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the history of this entry
-				for(;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				String[] history;
-				if (!sb.toString().equals("null")) {
-					history = sb.toString().split(","); 
-					if (history.length > historySize) {
-						throw new java.lang.ArrayIndexOutOfBoundsException();
-					}
-					for (int i = 0;i<history.length;i++) {
-						tempHistory.add(Integer.parseInt(history[i]));
-					}
-				}
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the year from the file.
-				for (;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				tempYear = Integer.parseInt(sb.toString());
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the month from the file.
-				for (;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				tempMonth = Integer.parseInt(sb.toString());
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the day from the file.
-				for (;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				tempDay = Integer.parseInt(sb.toString());
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the title from the file.
-				for (;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				tempTitle = sb.toString();
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the toggleable from file
-				for (;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				if (sb.toString().equals("1")) {
-					tempToggleable = true;
-				}
-				else {
-					tempToggleable = false;
-				}
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the modifiers from the file.
-				for (;record.charAt(offset) != '.';offset++) {
-					for (;record.charAt(offset) != '\t';offset++) {
-						sb.append(record.charAt(offset));
-					}
-					tempModifiers.add(sb.toString());
-					sb = new StringBuilder();
-				}
-				offset+=2;
-				sb = new StringBuilder();
-
-				//Get the modifierIdentifier from the file
-				for (;record.charAt(offset) != '\t';offset++) {
-					sb.append(record.charAt(offset));
-				}
-				tempModifierIdentifier = Integer.parseInt(sb.toString());
-				offset++;
-				sb = new StringBuilder();
-
-				//Get the recurring flag from the file
-				while(offset < record.length()) {
-					sb.append(record.charAt(offset));
-					offset++;
-				}
-				tempRecurringInt = Integer.parseInt(sb.toString());
-				tempRecurring = tempRecurringInt == 0 ? false : true;
-
-				entries.add(new Item(tempQuiz, tempHistory, tempAddThis,
-				            new OurDate(tempDay, tempMonth, tempYear), tempTitle,
-				            tempToggleable, tempModifiers, tempModifierIdentifier,
-				            tempRecurring));
-				tempModifiers = new ArrayList<String>();
-				tempHistory = new ArrayList<Integer>();
 			}
+			
+			StringBuilder sb = new StringBuilder();
+			int offset = 0;
+
+			//Get the addThis value.
+			for(;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			tempAddThis = Integer.parseInt(sb.toString());
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the history of this entry
+			for(;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			String[] history;
+			if (!sb.toString().equals("null")) {
+				history = sb.toString().split(","); 
+				if (history.length > historySize) {
+					throw new java.lang.ArrayIndexOutOfBoundsException();
+				}
+				for (int i = 0;i<history.length;i++) {
+					tempHistory.add(Integer.parseInt(history[i]));
+				}
+			}
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the year from the file.
+			for (;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			tempYear = Integer.parseInt(sb.toString());
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the month from the file.
+			for (;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			tempMonth = Integer.parseInt(sb.toString());
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the day from the file.
+			for (;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			tempDay = Integer.parseInt(sb.toString());
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the title from the file.
+			for (;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			tempTitle = sb.toString();
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the toggleable from file
+			for (;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			if (sb.toString().equals("1")) {
+				tempToggleable = true;
+			}
+			else {
+				tempToggleable = false;
+			}
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the modifiers from the file.
+			for (;record.charAt(offset) != '.';offset++) {
+				for (;record.charAt(offset) != '\t';offset++) {
+					sb.append(record.charAt(offset));
+				}
+				tempModifiers.add(sb.toString());
+				sb = new StringBuilder();
+			}
+			offset+=2;
+			sb = new StringBuilder();
+
+			//Get the modifierIdentifier from the file
+			for (;record.charAt(offset) != '\t';offset++) {
+				sb.append(record.charAt(offset));
+			}
+			tempModifierIdentifier = Integer.parseInt(sb.toString());
+			offset++;
+			sb = new StringBuilder();
+
+			//Get the recurring flag from the file
+			while(offset < record.length()) {
+				sb.append(record.charAt(offset));
+				offset++;
+			}
+			tempRecurringInt = Integer.parseInt(sb.toString());
+			tempRecurring = tempRecurringInt == 0 ? false : true;
+
+			entries.add(new Item(tempQuiz, tempHistory, tempAddThis,
+				    new OurDate(tempDay, tempMonth, tempYear), tempTitle,
+				    tempToggleable, tempModifiers, tempModifierIdentifier,
+				    tempRecurring));
+			tempModifiers = new ArrayList<String>();
+			tempHistory = new ArrayList<Integer>();
 		}
 	}
 
@@ -781,11 +780,13 @@ class MemoryLog {
 				printUsage();
 			}
 		} catch (java.io.FileNotFoundException e) {
-			System.out.println("Failed to load quizzes: could not find config file/perhaps a quiz is missing?");
+			System.out.println("FileNotFoundException caught. Are you missing memlog file, config file?");
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 			System.out.println("ArrayIndexOutOfBoundsException: Unable to read auto_memory_log.txt.");
 		} catch (java.lang.NumberFormatException e) {
 			System.out.println("NumberFormatException: Unable to read auto_memory_log.txt.");
+		} catch (ConfigLoadException e) {
+			System.out.println("Config file failed to load, check for errors in the file.");
 		}
 	}
 }
