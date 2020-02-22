@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 public class Item {
 
-	private Quiz quiz;          /* Quiz that is associated */
 	private int addThis;        /* The number of days to add to the date. */
 	private OurDate reviewOn;   /* The date on which the item needs to be reviewed. */
 	private String title;       /* The action that the user should take to push the item further down the list. */
@@ -18,16 +17,15 @@ public class Item {
 	// default constructor
 	//*****************************************************************************************
 	public Item() {
-		this(null, null, 0, null, null, false, null, 1, false);
+		this(null, 0, null, null, false, null, 1, false);
 	}
 
 	//*****************************************************************************************
 	// initial constructor
 	//*****************************************************************************************
-	public Item(Quiz quiz, ArrayList<Integer> addThisHistory, int addThis, OurDate reviewOn,
+	public Item(ArrayList<Integer> addThisHistory, int addThis, OurDate reviewOn,
 	            String title, boolean toggleable, ArrayList<String> modifiers,
 	            int modifierIdentifier, boolean recurring) {
-		this.quiz = quiz;
 		this.addThisHistory = addThisHistory;
 		this.addThis = addThis;
 		this.reviewOn = reviewOn;
@@ -42,7 +40,6 @@ public class Item {
 	// copy constructor
 	//*****************************************************************************************
 	public Item(Item item) {
-		this.quiz = item.quiz;
 		this.addThisHistory = item.addThisHistory;
 		this.addThis = item.addThis;
 		this.reviewOn = new OurDate();
@@ -142,13 +139,6 @@ public class Item {
 			addThisHistory.remove(0);	
 		}		
 		addThisHistory.add(addThis);
-	}
-
-	//*****************************************************************************************
-	// Getter for quiz.
-	//*****************************************************************************************
-	public Quiz getQuiz() {
-		return quiz;
 	}
 
 	//*****************************************************************************************

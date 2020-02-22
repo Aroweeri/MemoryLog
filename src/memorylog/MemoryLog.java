@@ -49,7 +49,6 @@ class MemoryLog {
 		}
 
 		//Create temporary holders for all of the values in each line of the file.
-		Quiz tempQuiz = null;
 		int tempAddThis = 0;
 		int tempYear = 0;
 		int tempMonth = 0;
@@ -172,7 +171,7 @@ class MemoryLog {
 			tempRecurringInt = Integer.parseInt(sb.toString());
 			tempRecurring = tempRecurringInt == 0 ? false : true;
 
-			entries.add(new Item(tempQuiz, tempHistory, tempAddThis,
+			entries.add(new Item(tempHistory, tempAddThis,
 				    new OurDate(tempDay, tempMonth, tempYear), tempTitle,
 				    tempToggleable, tempModifiers, tempModifierIdentifier,
 				    tempRecurring));
@@ -480,7 +479,7 @@ class MemoryLog {
 		history.add(addThis);
 
 		/* create new item and save it to disk. */
-		item = new Item(null, history, addThis, reviewDate, title, toggleable, modifiers, startModifier, isRecurring);
+		item = new Item(history, addThis, reviewDate, title, toggleable, modifiers, startModifier, isRecurring);
 		entries.add(item);
 		saveEntries();
 		return 0;
