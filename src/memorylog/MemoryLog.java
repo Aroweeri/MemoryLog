@@ -595,7 +595,7 @@ class MemoryLog {
 
 		//user specified -c option, they don't mean to test results
 		if(confirm == true) {
-			if(entries.get(id).isRecurring()) {
+			if(entries.get(id).getRecurring()) {
 				processIndex(entries.get(id), addThis, false, true, manualReviewDate);
 			} else {
 				processIndex(entries.get(id), addThis, false, false, manualReviewDate);
@@ -609,7 +609,7 @@ class MemoryLog {
 			Item tempItem = new Item(entries.get(id));
 
 			/* pass flag to only refine addThis of entry that is not recurring. */
-			if(entries.get(id).isRecurring()) {
+			if(entries.get(id).getRecurring()) {
 				processIndex(tempItem, addThis, true, true, manualReviewDate);
 			} else {
 				processIndex(tempItem, addThis, true, false, manualReviewDate);
