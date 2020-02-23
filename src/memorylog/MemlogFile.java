@@ -20,7 +20,7 @@ public class MemlogFile {
 	//****************************************************************************************
 	// getter for entries
 	//****************************************************************************************
-	public ArrayList<Entry> getEntries() {
+	public ArrayList<Item> getEntries() {
 		return entries;
 	}
 
@@ -28,7 +28,7 @@ public class MemlogFile {
 	// setter for entries
 	//****************************************************************************************
 	@XmlElement
-	public void setEntries(ArrayList<Entry> entries) {
+	public void setEntries(ArrayList<Item> entries) {
 		this.entries = entries;
 	}
 
