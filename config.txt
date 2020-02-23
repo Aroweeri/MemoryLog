@@ -1,2 +1,2 @@
 MEMORYLOGMAXBACKUPS=10
-MEMLOGPATH=default.memlog
+MEMLOGPATH=default.xml
