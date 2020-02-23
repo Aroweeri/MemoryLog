@@ -9,6 +9,11 @@ import java.time.LocalDate;
 import java.util.Date;
 import common.*;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 class MemoryLog {
 
 	MemlogFile memlogFile;   /* Object containing everything about the memlog file and entries. */
@@ -18,7 +23,7 @@ class MemoryLog {
 
 	LocalDate date; /* Used to determine what day is today. Used with viewTodaysEntries(). */
 
-	public MemoryLog() throws java.io.FileNotFoundException, ConfigLoadException {
+	public MemoryLog() throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
 		config = new Config("config.txt");
 		if(!config.loadingSuccess()) {
 			throw new ConfigLoadException();
@@ -32,15 +37,38 @@ class MemoryLog {
 	//*****************************************************************************************
 	// load the MemlogFile object with data from xml file.
 	//*****************************************************************************************
-	public void loadEntries() throws java.io.FileNotFoundException {
+	public void loadEntries() throws javax.xml.bind.JAXBException {
+		File f = null;
+		JAXBContext jaxbContext;
+		Unmarshaller unmarshaller;
 
+		try {
+			f = new File(config.MEMLOGPATH());
+			jaxbContext = JAXBContext.newInstance(MemlogFile.class);
+			unmarshaller = jaxbContext.createUnmarshaller();
+			memlogFile = (MemlogFile)unmarshaller.unmarshal(f);
+		} catch (javax.xml.bind.JAXBException e) {
+			System.out.println("Failed to unmarshal file: " + f.getAbsolutePath());
+			throw new javax.xml.bind.JAXBException("");
+		}
 	}
 
 	//*****************************************************************************************
 	// write the xml file from the MemlogFile object.
 	//*****************************************************************************************
 	public void saveEntries() {
+		File f = null;
+		JAXBContext jaxbContext;
+		Marshaller marshaller;
 
+		try {
+			f = new File(config.MEMLOGPATH());
+			jaxbContext = JAXBContext.newInstance(MemlogFile.class);
+			marshaller = jaxbContext.createMarshaller();
+			marshaller.marshal(memlogFile, f);
+		} catch (javax.xml.bind.JAXBException e) {
+			System.out.println("Failed to marshal file: " + f.getAbsolutePath() + ", changes are unsaved.");
+		}
 	}
 
 	//*****************************************************************************************
@@ -629,6 +657,8 @@ class MemoryLog {
 			System.out.println("NumberFormatException: Unable to read memlog file.");
 		} catch (ConfigLoadException e) {
 			System.out.println("Config file failed to load, check for errors in the file.");
+		} catch (javax.xml.bind.JAXBException e) {
+			System.out.println("JAXBException");
 		}
 	}
 }
