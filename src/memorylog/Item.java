@@ -1,7 +1,11 @@
 package memorylog;
 
 import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class Item {
 
 	private int addThis;        /* The number of days to add to the date. */
@@ -151,6 +155,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for addThis.
 	//*****************************************************************************************
+	@XmlElement
 	public void setAddThis(int addThis) {
 		this.addThis = addThis;
 	}
@@ -165,6 +170,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for reviewOn.
 	//*****************************************************************************************
+	@XmlElement
 	public void setReviewOn(OurDate reviewOn) {
 		this.reviewOn = reviewOn;
 	}
@@ -179,6 +185,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for title.
 	//*****************************************************************************************
+	@XmlElement
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -193,6 +200,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for toggleable.
 	//*****************************************************************************************
+	@XmlElement
 	public void setToggleable(boolean toogleable) {
 		this.toggleable = toggleable;
 	}
@@ -207,6 +215,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for modifiers.
 	//*****************************************************************************************
+	@XmlElement
 	public void setModifiers(ArrayList<String> modiiers) {
 		this.modifiers = modifiers;
 	}
@@ -221,6 +230,7 @@ public class Item {
 	//*****************************************************************************************
 	// setter for addThisHistory.
 	//*****************************************************************************************
+	@XmlElement
 	public void setAddThisHistory(ArrayList<Integer> addThisHistory) {
 		this.addThisHistory = addThisHistory;
 	}
@@ -235,6 +245,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for modifierIdentifier
 	//*****************************************************************************************
+	@XmlElement
 	public void setModifierIdentifier(int a) {
 		modifierIdentifier = a;
 	}
@@ -249,6 +260,7 @@ public class Item {
 	//*****************************************************************************************
 	// setter for recurring
 	//*****************************************************************************************
+	@XmlElement
 	public void setRecurring(boolean recurring) {
 		this.recurring = recurring;
 	}
