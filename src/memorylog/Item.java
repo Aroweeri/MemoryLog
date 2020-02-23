@@ -1,4 +1,4 @@
-package common;
+package memorylog;
 
 import java.util.ArrayList;
 
