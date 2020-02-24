@@ -203,7 +203,7 @@ public class Item {
 	// Setter for toggleable.
 	//*****************************************************************************************
 	@XmlElement
-	public void setToggleable(boolean toogleable) {
+	public void setToggleable(boolean toggleable) {
 		this.toggleable = toggleable;
 	}
 
