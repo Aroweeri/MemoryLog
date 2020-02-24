@@ -3,6 +3,7 @@ package memorylog;
 import common.*;
 import java.util.ArrayList;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -216,8 +217,9 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for modifiers.
 	//*****************************************************************************************
-	@XmlElement
-	public void setModifiers(ArrayList<String> modiiers) {
+	@XmlElementWrapper(name="modfiers")
+	@XmlElement(name="modifier")
+	public void setModifiers(ArrayList<String> modifiers) {
 		this.modifiers = modifiers;
 	}
 
@@ -231,7 +233,8 @@ public class Item {
 	//*****************************************************************************************
 	// setter for addThisHistory.
 	//*****************************************************************************************
-	@XmlElement
+	@XmlElementWrapper(name="addThisHistory")
+	@XmlElement(name="addThisHistoryItem")
 	public void setAddThisHistory(ArrayList<Integer> addThisHistory) {
 		this.addThisHistory = addThisHistory;
 	}

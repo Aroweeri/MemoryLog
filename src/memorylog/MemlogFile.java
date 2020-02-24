@@ -2,6 +2,7 @@ package memorylog;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import java.util.ArrayList;
@@ -10,11 +11,9 @@ import java.util.ArrayList;
 public class MemlogFile {
 
 	private ArrayList<Item> entries;
-	private String fileName;
 
 	public MemlogFile() {
 		entries = null;
-		fileName = null;
 	}
 
 	//****************************************************************************************
@@ -27,24 +26,10 @@ public class MemlogFile {
 	//****************************************************************************************
 	// setter for entries
 	//****************************************************************************************
-	@XmlElement
+	@XmlElementWrapper(name="entries")
+	@XmlElement(name="entry")
 	public void setEntries(ArrayList<Item> entries) {
 		this.entries = entries;
-	}
-
-	//****************************************************************************************
-	// getter for fileName
-	//****************************************************************************************
-	public String getFileName() {
-		return fileName;
-	}
-
-	//****************************************************************************************
-	// setter for fileName
-	//****************************************************************************************
-	@XmlElement
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
 	}
 }
 
