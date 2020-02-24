@@ -24,29 +24,41 @@ class MemoryLog {
 	LocalDate date; /* Used to determine what day is today. Used with viewTodaysEntries(). */
 
 	public MemoryLog() throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
+		boolean loadSuccess = false;
+
 		config = new Config("config.txt");
 		if(!config.loadingSuccess()) {
 			throw new ConfigLoadException();
 		}
 		memlogFile = new MemlogFile();
-		entries = memlogFile.getEntries();
 		date = LocalDate.now();
-		loadEntries();
+		loadSuccess = loadEntries();
+		if(!loadSuccess) {
+			memlogFile.setEntries(new ArrayList<Item>());
+		}
+		entries = memlogFile.getEntries();
 	}
 
 	//*****************************************************************************************
 	// load the MemlogFile object with data from xml file.
 	//*****************************************************************************************
-	public void loadEntries() throws javax.xml.bind.JAXBException {
+	public boolean loadEntries() throws javax.xml.bind.JAXBException {
 		File f = null;
 		JAXBContext jaxbContext;
 		Unmarshaller unmarshaller;
 
 		try {
 			f = new File(config.MEMLOGPATH());
+
+			/* if file is empty don't try and read anything. */
+			if(f.length() == 0) {
+				return false;
+			}
+
 			jaxbContext = JAXBContext.newInstance(MemlogFile.class);
 			unmarshaller = jaxbContext.createUnmarshaller();
 			memlogFile = (MemlogFile)unmarshaller.unmarshal(f);
+			return true;
 		} catch (javax.xml.bind.JAXBException e) {
 			System.out.println("Failed to unmarshal file: " + f.getAbsolutePath());
 			throw new javax.xml.bind.JAXBException("");
@@ -65,6 +77,7 @@ class MemoryLog {
 			f = new File(config.MEMLOGPATH());
 			jaxbContext = JAXBContext.newInstance(MemlogFile.class);
 			marshaller = jaxbContext.createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.marshal(memlogFile, f);
 		} catch (javax.xml.bind.JAXBException e) {
 			System.out.println("Failed to marshal file: " + f.getAbsolutePath() + ", changes are unsaved.");
