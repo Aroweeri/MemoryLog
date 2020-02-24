@@ -400,7 +400,6 @@ class MemoryLog {
 		}
 
 		/* delete entry and save. */
-		System.out.println(index);
 		entries.remove(index);
 		saveEntries();
 		return 0;
