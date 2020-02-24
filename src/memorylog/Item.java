@@ -217,7 +217,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for modifiers.
 	//*****************************************************************************************
-	@XmlElementWrapper(name="modfiers")
+	@XmlElementWrapper(name="modifiers")
 	@XmlElement(name="modifier")
 	public void setModifiers(ArrayList<String> modifiers) {
 		this.modifiers = modifiers;
