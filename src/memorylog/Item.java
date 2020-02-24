@@ -1,10 +1,15 @@
-package common;
+package memorylog;
 
+import common.*;
 import java.util.ArrayList;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class Item {
 
-	private Quiz quiz;          /* Quiz that is associated */
 	private int addThis;        /* The number of days to add to the date. */
 	private OurDate reviewOn;   /* The date on which the item needs to be reviewed. */
 	private String title;       /* The action that the user should take to push the item further down the list. */
@@ -18,16 +23,15 @@ public class Item {
 	// default constructor
 	//*****************************************************************************************
 	public Item() {
-		this(null, null, 0, null, null, false, null, 1, false);
+		this(null, 0, null, null, false, null, 1, false);
 	}
 
 	//*****************************************************************************************
 	// initial constructor
 	//*****************************************************************************************
-	public Item(Quiz quiz, ArrayList<Integer> addThisHistory, int addThis, OurDate reviewOn,
+	public Item(ArrayList<Integer> addThisHistory, int addThis, OurDate reviewOn,
 	            String title, boolean toggleable, ArrayList<String> modifiers,
 	            int modifierIdentifier, boolean recurring) {
-		this.quiz = quiz;
 		this.addThisHistory = addThisHistory;
 		this.addThis = addThis;
 		this.reviewOn = reviewOn;
@@ -42,7 +46,6 @@ public class Item {
 	// copy constructor
 	//*****************************************************************************************
 	public Item(Item item) {
-		this.quiz = item.quiz;
 		this.addThisHistory = item.addThisHistory;
 		this.addThis = item.addThis;
 		this.reviewOn = new OurDate();
@@ -145,13 +148,6 @@ public class Item {
 	}
 
 	//*****************************************************************************************
-	// Getter for quiz.
-	//*****************************************************************************************
-	public Quiz getQuiz() {
-		return quiz;
-	}
-
-	//*****************************************************************************************
 	// Getter for addThis.
 	//*****************************************************************************************
 	public int getAddThis() {
@@ -161,6 +157,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for addThis.
 	//*****************************************************************************************
+	@XmlElement
 	public void setAddThis(int addThis) {
 		this.addThis = addThis;
 	}
@@ -175,6 +172,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for reviewOn.
 	//*****************************************************************************************
+	@XmlElement
 	public void setReviewOn(OurDate reviewOn) {
 		this.reviewOn = reviewOn;
 	}
@@ -189,6 +187,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for title.
 	//*****************************************************************************************
+	@XmlElement
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -203,7 +202,8 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for toggleable.
 	//*****************************************************************************************
-	public void setToggleable(boolean toogleable) {
+	@XmlElement
+	public void setToggleable(boolean toggleable) {
 		this.toggleable = toggleable;
 	}
 
@@ -217,10 +217,28 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for modifiers.
 	//*****************************************************************************************
-	public void setModifiers(ArrayList<String> modiiers) {
+	@XmlElementWrapper(name="modifiers")
+	@XmlElement(name="modifier")
+	public void setModifiers(ArrayList<String> modifiers) {
 		this.modifiers = modifiers;
 	}
-	
+
+	//*****************************************************************************************
+	// Getter for addThisHistory.
+	//*****************************************************************************************
+	public ArrayList<Integer> getAddThisHistory() {
+		return addThisHistory;
+	}
+
+	//*****************************************************************************************
+	// setter for addThisHistory.
+	//*****************************************************************************************
+	@XmlElementWrapper(name="addThisHistory")
+	@XmlElement(name="addThisHistoryItem")
+	public void setAddThisHistory(ArrayList<Integer> addThisHistory) {
+		this.addThisHistory = addThisHistory;
+	}
+
 	//*****************************************************************************************
 	// Getter for modifierIdentifier
 	//*****************************************************************************************
@@ -231,6 +249,7 @@ public class Item {
 	//*****************************************************************************************
 	// Setter for modifierIdentifier
 	//*****************************************************************************************
+	@XmlElement
 	public void setModifierIdentifier(int a) {
 		modifierIdentifier = a;
 	}
@@ -238,8 +257,16 @@ public class Item {
 	//*****************************************************************************************
 	// Getter for recurring.
 	//*****************************************************************************************
-	public boolean isRecurring() {
+	public boolean getRecurring() {
 		return recurring;
+	}
+
+	//*****************************************************************************************
+	// setter for recurring
+	//*****************************************************************************************
+	@XmlElement
+	public void setRecurring(boolean recurring) {
+		this.recurring = recurring;
 	}
 
 	//*****************************************************************************************
