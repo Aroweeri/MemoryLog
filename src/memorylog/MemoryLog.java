@@ -623,10 +623,10 @@ class MemoryLog {
 		memlogFilename = memlogFilenameParts[memlogFilenameParts.length-1];
 
 		date = new Date();
-		filename = "backups/" + memlogFilename + "." + date.getTime();
+		filename = config.BACKUPSPATH() + "/" + memlogFilename + "." + date.getTime();
 		source = new File(config.MEMLOGPATH());
 		dest = new File(filename);
-		backupDir = new File("backups");
+		backupDir = new File(config.BACKUPSPATH());
 
 		/* check if backup directory exists, and if it doesn't then create it. */
 		if(!backupDir.exists() || !backupDir.isDirectory()) {

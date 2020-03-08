@@ -5,9 +5,9 @@ import java.util.Scanner;
 
 public class Config {
 
-	private int MEMORYLOGMAXBACKUPS = 10; /* currently not implemented anywhere. */
-	private String MEMLOGPATH =       "default.memlog";
-	private boolean loadingSuccess = true;/* used to indicate whether or not the loading succeeded. */
+	private String MEMLOGPATH =       null;
+	private String BACKUPSPATH =      null;
+	private boolean loadingSuccess =  true;/* used to indicate whether or not the loading succeeded. */
 
 	public Config(String filename) {
 		loadConfiguration(filename);
@@ -65,18 +65,11 @@ public class Config {
 			value = line.subSequence(indexOfEqualsSign+1, line.length()).toString();
 
 
-			if(option.equals("MEMORYLOGMAXBACKUPS")) {
-				try {
-					MEMORYLOGMAXBACKUPS = Integer.parseInt(value);
-				} catch (java.lang.NumberFormatException e) {
-					System.out.println("Error parsing " + f.getAbsolutePath() + " on line " + currentLine + ":failed to parse integer value from string value");
-					loadingSuccess = false;
-					return;
-				}
-			} else if (option.equals("MEMLOGPATH")) {
+			if (option.equals("MEMLOGPATH")) {
 				MEMLOGPATH = value;
+			} else if (option.equals("BACKUPSPATH")) {
+				BACKUPSPATH = value;
 			}
-
 		}
 	}
 
@@ -88,16 +81,16 @@ public class Config {
 	}
 
 	//*****************************************************************************************
-	// Getter for MEMORYLOGMAXBACKUPS variable.
-	//*****************************************************************************************
-	public int MEMORYLOGMAXBACKUPS() {
-		return MEMORYLOGMAXBACKUPS;
-	}
-
-	//*****************************************************************************************
 	// Getter for MEMLOGPATH variable.
 	//*****************************************************************************************
 	public String MEMLOGPATH() {
 		return MEMLOGPATH;
+	}
+
+	//*****************************************************************************************
+	// Getter for BACKUPSPATH variable
+	//*****************************************************************************************
+	public String BACKUPSPATH() {
+		return BACKUPSPATH;
 	}
 }
