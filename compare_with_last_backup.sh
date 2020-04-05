@@ -1,4 +1,6 @@
-memlogPath=$(grep "MEMLOGPATH" config.txt | cut -d= -f2)
+java -jar build/jar/MemoryLog.jar show --all > compare
+backupPath="backups/$(ls -1 backups | grep basic | tail -n 1)"
 
-colordiff backups/$(ls -1 backups | tail -n 1) "$memlogPath" 
-wc -l "$memlogPath"  backups/$(ls -1 backups | tail -n 1)
+colordiff compare "$backupPath"
+wc -l compare "$backupPath"
+rm compare

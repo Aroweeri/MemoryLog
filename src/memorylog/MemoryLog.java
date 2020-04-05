@@ -605,12 +605,20 @@ class MemoryLog {
 	// Copy the current memlog file into the backups folder. Delete the oldest backup if
 	// there are more than MEMORYLOGMAXBACKUPS (see config.txt).
 	//
+	// Will create a copy of the actual xml file as well as a file containing the output of
+	// the "show --all" command for easy human digestion.
+	//
 	// Returns 1 on failure to create backup and 0 otherwise.
 	//*****************************************************************************************
 	public int backup(String[] args) {
 		File source;
-		File dest;
-		String filename = null;;
+		File destXml;
+		File destTxt;
+
+		/* two filenames for the xml and output from "show --all" */
+		String filenameXml = null; 
+		String filenameTxt = null;
+
 		Scanner s = null;
 		PrintWriter p = null;
 		Date date = null;
@@ -618,14 +626,18 @@ class MemoryLog {
 		String[] memlogFilenameParts;
 		String memlogFilename;
 
+		StringBuilder sb = new StringBuilder();
+
 		/* get only the filename of whatever the path was to the memlog file. */
 		memlogFilenameParts = config.MEMLOGPATH().split("/");
 		memlogFilename = memlogFilenameParts[memlogFilenameParts.length-1];
 
 		date = new Date();
-		filename = config.BACKUPSPATH() + "/" + memlogFilename + "." + date.getTime();
+		filenameXml = config.BACKUPSPATH() + "/" + memlogFilename + "." + date.getTime();
+		filenameTxt = config.BACKUPSPATH() + "/" + memlogFilename + "." + date.getTime() + ".basic";
 		source = new File(config.MEMLOGPATH());
-		dest = new File(filename);
+		destXml = new File(filenameXml);
+		destTxt = new File(filenameTxt);
 		backupDir = new File(config.BACKUPSPATH());
 
 		/* check if backup directory exists, and if it doesn't then create it. */
@@ -638,13 +650,24 @@ class MemoryLog {
 		}
 
 		try {
+
+			/* write Xml backup */
 			s = new Scanner(source);
-			p = new PrintWriter(dest);
+			p = new PrintWriter(destXml);
 			while(s.hasNextLine()) {
 				p.println(s.nextLine());
 			}
 			p.close();
 			s.close();
+
+			/* write Txt backup */
+			for (int i = 0;i<entries.size();i++) {
+				sb.append(String.format("%03d",i) + ": " + entries.get(i).toString() + "\n");
+			}
+			p = new PrintWriter(destTxt);
+			p.print(sb.toString());
+			p.close();
+
 		} catch (java.io.FileNotFoundException e) {
 			System.out.println("Failed to open files for backup.");
 			return 1;
