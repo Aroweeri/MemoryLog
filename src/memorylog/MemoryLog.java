@@ -662,7 +662,7 @@ class MemoryLog {
 
 			/* write Txt backup */
 			for (int i = 0;i<entries.size();i++) {
-				sb.append(String.format("%03d",i) + ": " + entries.get(i).toString() + "\n");
+				sb.append(entries.get(i).toString() + "\n");
 			}
 			p = new PrintWriter(destTxt);
 			p.print(sb.toString());

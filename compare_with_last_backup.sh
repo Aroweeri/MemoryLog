@@ -1,6 +1,7 @@
-java -jar build/jar/MemoryLog.jar show --all > compare
-backupPath="backups/$(ls -1 backups | grep basic | tail -n 1)"
+java -jar build/jar/MemoryLog.jar show --all | cut -b 6- > compare
+backupFolder="$(grep BACKUPSPATH config.txt | cut -d= -f2)"
+backupPath="${backupFolder}/$(ls -1 $backupFolder | grep basic | tail -n 1)"
 
-colordiff compare "$backupPath"
-wc -l compare "$backupPath"
+colordiff "$backupPath" compare
+wc -l "$backupPath" compare
 rm compare
