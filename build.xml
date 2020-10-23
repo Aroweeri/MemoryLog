@@ -50,7 +50,8 @@
 	</target>
 
 	<target name="test" depends="compile-tests">
-		<java classname="org.junit.runner.JUnitCore" args="tests.OurDateTest">
+		<java classname="org.junit.runner.JUnitCore">
+			<arg value="tests.OurDateTest"/>
 			<classpath>
 				<pathelement location="src"/>
 				<pathelement path="build/classes"/>
