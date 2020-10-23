@@ -14,7 +14,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-class MemoryLog {
+public class MemoryLog {
 
 	MemlogFile memlogFile;   /* Object containing everything about the memlog file and entries. */
 	ArrayList<Item> entries; /* just a reference to memlogFile.getEntries(); */
@@ -24,9 +24,13 @@ class MemoryLog {
 	LocalDate date; /* Used to determine what day is today. Used with viewTodaysEntries(). */
 
 	public MemoryLog() throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
+		this("config.txt");
+	}
+
+	public MemoryLog(String configPath) throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
 		boolean loadSuccess = false;
 
-		config = new Config("config.txt");
+		config = new Config(configPath);
 		if(!config.loadingSuccess()) {
 			throw new ConfigLoadException();
 		}
