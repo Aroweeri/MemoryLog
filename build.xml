@@ -46,15 +46,22 @@
 				<attribute name="Main-Class" value="testmanager.TestManager"/>
 			</manifest>
 		</jar>
-
 	</target>
 
 	<target name="test" depends="compile-tests">
 		<java classname="org.junit.runner.JUnitCore">
+			<arg value="tests.MemoryLogTest"/>
+			<classpath>
+				<pathelement location="build/classes"/>
+				<fileset dir="lib">
+					<include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</java>
+		<java classname="org.junit.runner.JUnitCore">
 			<arg value="tests.OurDateTest"/>
 			<classpath>
-				<pathelement location="src"/>
-				<pathelement path="build/classes"/>
+				<pathelement location="build/classes"/>
 				<fileset dir="lib">
 					<include name="*.jar"/>
 				</fileset>
