@@ -24,10 +24,14 @@ public class MemoryLog {
 	LocalDate date; /* Used to determine what day is today. Used with viewTodaysEntries(). */
 
 	public MemoryLog() throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
-		this("config.txt");
+		this("config.txt", null);
 	}
 
-	public MemoryLog(String configPath) throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
+	public MemoryLog(LocalDate date) throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
+		this("config.txt", date);
+	}
+
+	public MemoryLog(String configPath, LocalDate date) throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
 		boolean loadSuccess = false;
 
 		config = new Config(configPath);
@@ -35,7 +39,13 @@ public class MemoryLog {
 			throw new ConfigLoadException();
 		}
 		memlogFile = new MemlogFile();
-		date = LocalDate.now();
+
+		if(date == null) {
+			this.date = LocalDate.now();
+		} else {
+			this.date = date;
+		}
+
 		loadSuccess = loadEntries();
 		if(!loadSuccess) {
 			memlogFile.setEntries(new ArrayList<Item>());
