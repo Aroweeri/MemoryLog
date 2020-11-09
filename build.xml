@@ -49,7 +49,7 @@
 	</target>
 
 	<target name="test" depends="compile-tests">
-		<java classname="org.junit.runner.JUnitCore">
+		<java fork="true" classname="org.junit.runner.JUnitCore">
 			<arg value="tests.MemoryLogTest"/>
 			<classpath>
 				<pathelement location="build/classes"/>
@@ -58,7 +58,7 @@
 				</fileset>
 			</classpath>
 		</java>
-		<java classname="org.junit.runner.JUnitCore">
+		<java fork="true" classname="org.junit.runner.JUnitCore">
 			<arg value="tests.OurDateTest"/>
 			<classpath>
 				<pathelement location="build/classes"/>
