@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<memlogFile>
+    <entries>
+        <entry>
+            <addThis>0</addThis>
+            <addThisHistory>
+                <addThisHistoryItem>0</addThisHistoryItem>
+            </addThisHistory>
+            <modifierIdentifier>0</modifierIdentifier>
+            <modifiers/>
+            <recurring>false</recurring>
+            <reviewOn>
+                <day>5</day>
+                <month>11</month>
+                <year>2020</year>
+            </reviewOn>
+            <title>test1</title>
+            <toggleable>false</toggleable>
+        </entry>
+        <entry>
+            <addThis>0</addThis>
+            <addThisHistory>
+                <addThisHistoryItem>0</addThisHistoryItem>
+            </addThisHistory>
+            <modifierIdentifier>0</modifierIdentifier>
+            <modifiers/>
+            <recurring>false</recurring>
+            <reviewOn>
+                <day>6</day>
+                <month>11</month>
+                <year>2020</year>
+            </reviewOn>
+            <title>test2</title>
+            <toggleable>false</toggleable>
+        </entry>
+    </entries>
+</memlogFile>

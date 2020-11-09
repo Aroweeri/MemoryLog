@@ -31,6 +31,10 @@ public class MemoryLog {
 		this("config.txt", date);
 	}
 
+	public MemoryLog(String configPath) throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
+		this(configPath, null);
+	}
+
 	public MemoryLog(String configPath, LocalDate date) throws java.io.FileNotFoundException, ConfigLoadException, javax.xml.bind.JAXBException {
 		boolean loadSuccess = false;
 
@@ -187,7 +191,7 @@ public class MemoryLog {
 		}
 		for(int i = 0;i<entries.size();i++) {
 			if(entries.get(i).getReviewOn().calcDays() == today.calcDays()) {
-				numItemsOnTestDay++;
+				numItemsOnDefaultDay++;
 			}
 		}
 
@@ -202,8 +206,8 @@ public class MemoryLog {
 			today.setMonth(date.getMonthValue());
 			today.setYear(date.getYear());
 
-			/* figure out what date it will be on today + addThis. */
-			for(int j = 0;j<addThis;j++) {
+			/* figure out what date it will be on today + addThis + change. */
+			for(int j = 0;j<addThis+change;j++) {
 				today.addOne();
 			}
 
@@ -227,9 +231,9 @@ public class MemoryLog {
 			today.setMonth(date.getMonthValue());
 			today.setYear(date.getYear());
 
-			/* figure out what date it will be on today + addThis. */
-			for(int j = 0;j<addThis;j++) {
-				today.subtractOne();
+			/* figure out what date it will be on today + addThis - change. */
+			for(int j = 0;j<addThis-change;j++) {
+				today.addOne();
 			}
 
 			for(int j = 0;j<entries.size();j++) {
