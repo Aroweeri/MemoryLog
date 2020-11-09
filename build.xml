@@ -6,13 +6,13 @@
 
 	<target name="compile" depends="clean">
 		<mkdir dir="build/classes"/>
-		<javac sourcepath="src" srcdir="src/memorylog" destdir="build/classes">
+		<javac sourcepath="src" srcdir="src/memorylog" destdir="build/classes" debug="true">
 			<classpath path="src"/>
 		</javac>
-		<javac sourcepath="src" srcdir="src/testmanager" destdir="build/classes">
+		<javac sourcepath="src" srcdir="src/testmanager" destdir="build/classes" debug="true">
 			<classpath path="src"/>
 		</javac>
-		<javac sourcepath="src" srcdir="src/subjecttester" destdir="build/classes">
+		<javac sourcepath="src" srcdir="src/subjecttester" destdir="build/classes" debug="true">
 			<classpath path="src"/>
 		</javac>
 	</target>
