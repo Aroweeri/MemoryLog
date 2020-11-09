@@ -138,61 +138,99 @@ public class MemoryLog {
 	// change to anywhere between 6 and 10. It will choose the day that has the fewest
 	// entries in that range of days surrounding the original addThis. 
 	//
+	// The algorithm will prefer days closer to the original addThis. For example, if
+	// an addThis value is surrounded by days with no items, it will still choose the original
+	// number despite all the other possibilities being just as good.
+	//
 	// Returns the modified addThis value.
 	//*****************************************************************************************
 	public int refineAddThis(int addThis, boolean messages) {
-		int min = addThis;
-		int max = addThis;
 		int change = 0;
 		int updatedAddThis = addThis;
 		int numItemsOnTestDay = 0;
-		int minItemsOnTestDay = 0;
+		int numItemsOnDefaultDay = 0;
 		OurDate today = new OurDate(date.getDayOfMonth(), date.getMonthValue(), date.getYear());
 		Item testItem = new Item();
 		testItem.setReviewOn(today);
 
-		/* decide what the min and max should be, accounting for special cases that are too
-		 * small for the algorithm to make sense. */
+		/* decide what the possible change in value should be, accounting for special cases that are
+		too small for the algorithm to make sense. */
 		switch(addThis) {
 			case 1:
-				min = 1;
-				max = 1;
+				change = 0;
 				break;
 			case 2:
-				min = 2;
-				max = 3;
-				break;
 			case 3:
-				min = 2;
-				max = 4;
+				change = 1;
 				break;
 			default:
 				change = (int)((float)addThis * 0.25);
-				min = addThis-change;
-				max = addThis+change;
+		}
+
+		/* get number of items on future day without modifying addThis so that we have something 
+		   to compare to. */
+		today.setDay(date.getDayOfMonth());
+		today.setMonth(date.getMonthValue());
+		today.setYear(date.getYear());
+		for(int i = 0;i<addThis;i++) {
+			today.addOne();
+		}
+		for(int i = 0;i<entries.size();i++) {
+			if(entries.get(i).getReviewOn().calcDays() == today.calcDays()) {
+				numItemsOnTestDay++;
+			}
 		}
 
 		/* Try each date in the range and find the one with the least number of items. */
-		for(int i = min;i<max+1;i++) {
+		for(int i = 1;i<=change;i++) {
+
+			//**************************************************
+			/* Test day that is forward 'i' number of times.  */
+			//**************************************************
 			numItemsOnTestDay = 0;
 			today.setDay(date.getDayOfMonth());
 			today.setMonth(date.getMonthValue());
 			today.setYear(date.getYear());
-			for(int j = 0;j<i;j++) {
+
+			/* figure out what date it will be on today + addThis. */
+			for(int j = 0;j<addThis;j++) {
 				today.addOne();
 			}
+
 			for(int j = 0;j<entries.size();j++) {
 				if(entries.get(j).getReviewOn().calcDays() == today.calcDays()) {
 					numItemsOnTestDay++;
 				}
 			}
 
-			if(i == min) {
-				minItemsOnTestDay = numItemsOnTestDay;
-				updatedAddThis = i;
-			} else if(numItemsOnTestDay < minItemsOnTestDay) {
-				minItemsOnTestDay = numItemsOnTestDay;
-				updatedAddThis = i;
+			if(numItemsOnTestDay < numItemsOnDefaultDay) {
+				numItemsOnDefaultDay = numItemsOnTestDay;
+				updatedAddThis = addThis+i;
+			}
+
+			//**************************************************
+			/* Test day that is backward 'i' number of times. */
+			//**************************************************
+
+			numItemsOnTestDay = 0;
+			today.setDay(date.getDayOfMonth());
+			today.setMonth(date.getMonthValue());
+			today.setYear(date.getYear());
+
+			/* figure out what date it will be on today + addThis. */
+			for(int j = 0;j<addThis;j++) {
+				today.subtractOne();
+			}
+
+			for(int j = 0;j<entries.size();j++) {
+				if(entries.get(j).getReviewOn().calcDays() == today.calcDays()) {
+					numItemsOnTestDay++;
+				}
+			}
+
+			if(numItemsOnTestDay < numItemsOnDefaultDay) {
+				numItemsOnDefaultDay = numItemsOnTestDay;
+				updatedAddThis = addThis-i;
 			}
 		}
 		if(messages && updatedAddThis != addThis) {
