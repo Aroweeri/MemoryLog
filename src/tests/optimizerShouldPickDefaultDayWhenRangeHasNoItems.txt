@@ -1,0 +1,2 @@
+MEMLOGPATH=default.xml
+BACKUPSPATH=backups

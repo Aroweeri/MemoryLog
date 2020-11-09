@@ -141,6 +141,25 @@ public class OurDate {
 	}
 
 	//*****************************************************************************************
+	// Removes one day from the date. Updates the month and year if the day was the beginning
+	// of the month or year
+	//*****************************************************************************************
+	public void subtractOne() {
+		if (day == 1) {
+			if(month == 1) {
+				month = 12;
+				day = daysPerMonth[month-1];
+				year--;
+			} else {
+				month--;
+				day = daysPerMonth[month-1];
+			}
+		} else {
+			day--;
+		}
+	}
+
+	//*****************************************************************************************
 	// returns a (DD/MM/YYYY) representation of the date.
 	//*****************************************************************************************
 	public String toString() {

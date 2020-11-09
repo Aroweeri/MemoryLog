@@ -1,0 +1,2 @@
+MEMLOGPATH=src/tests/optimizerShouldPickDayWithZeroEntries.xml
+BACKUPSPATH=backups
