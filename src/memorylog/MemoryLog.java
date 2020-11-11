@@ -207,7 +207,7 @@ public class MemoryLog {
 			today.setYear(date.getYear());
 
 			/* figure out what date it will be on today + addThis + change. */
-			for(int j = 0;j<addThis+change;j++) {
+			for(int j = 0;j<addThis+i;j++) {
 				today.addOne();
 			}
 
@@ -232,7 +232,7 @@ public class MemoryLog {
 			today.setYear(date.getYear());
 
 			/* figure out what date it will be on today + addThis - change. */
-			for(int j = 0;j<addThis-change;j++) {
+			for(int j = 0;j<addThis-i;j++) {
 				today.addOne();
 			}
 
