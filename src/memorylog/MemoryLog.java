@@ -115,6 +115,8 @@ public class MemoryLog {
 			if(!isRecurring) {
 				refinedAddThis = refineAddThis(addThis, messages);
 				passedItem.setAddThis(refinedAddThis);
+			} else {
+				passedItem.setAddThis(addThis);
 			}
 			
 			//Set date to current date, start to add days.
@@ -527,25 +529,13 @@ public class MemoryLog {
 
 		//user specified -c option, they don't mean to test results
 		if(confirm == true) {
-			if(entries.get(id).getRecurring()) {
-				processIndex(entries.get(id), addThis, false, true, manualReviewDate);
-			} else {
-				processIndex(entries.get(id), addThis, false, false, manualReviewDate);
-			}
-
+			processIndex(entries.get(id), addThis, false, entries.get(id).getRecurring(), manualReviewDate);
 			entries.get(id).updateHistory(addThis,historySize); //Add addThis to the history of this entry.
 			Collections.sort(entries, new DateComparator());    //sort the entries based on review date.
 			saveEntries();
 		} else {
-			//Create an item to display what the entry will be changed to before it happens.
 			Item tempItem = new Item(entries.get(id));
-
-			/* pass flag to only refine addThis of entry that is not recurring. */
-			if(entries.get(id).getRecurring()) {
-				processIndex(tempItem, addThis, true, true, manualReviewDate);
-			} else {
-				processIndex(tempItem, addThis, true, false, manualReviewDate);
-			}
+			processIndex(tempItem, addThis, true, entries.get(id).getRecurring(), manualReviewDate);
 
 			//Show new record information
 			System.out.println("History: " + entries.get(id).showHistory());
