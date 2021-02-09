@@ -416,6 +416,7 @@ public class MemoryLog {
 		/* create new item and save it to disk. */
 		item = new Item(history, addThis, reviewDate, title, toggleable, modifiers, startModifier, isRecurring);
 		entries.add(item);
+		Collections.sort(entries, new DateComparator());    //sort the entries based on review date.
 		saveEntries();
 		return 0;
 	}
